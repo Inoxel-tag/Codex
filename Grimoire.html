@@ -1,263 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codex Arcanum - Ancient Grimoire</title>
-    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel+Decorative&display=swap" rel="stylesheet">
+    <title>Codex Arcanum - Grimoire Ancien</title>
     <style>
-        :root {
-            --parchment: #f2e8c9;
-            --parchment-dark: #e6d8a5;
-            --ink: #3a2c1a;
-            --blood: #8b0000;
-            --gold: #d4af37;
-            --shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
+        /* Styles de base */
         body {
-            font-family: 'MedievalSharp', cursive;
+            font-family: 'Times New Roman', serif;
             background-color: #1a1a1a;
-            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/old_map.png');
-            color: var(--ink);
+            color: #3a2c1a;
             margin: 0;
             padding: 20px;
             line-height: 1.6;
-            min-height: 100vh;
         }
 
         .container {
             max-width: 900px;
-            margin: 20px auto;
-            padding: 40px;
-            background-color: var(--parchment);
-            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/paper_texture.png');
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), inset 0 0 50px rgba(139, 69, 19, 0.2);
-            border: 15px solid transparent;
-            border-image: url('https://i.imgur.com/ZYQfQ0a.png') 30 round;
-            position: relative;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #f2e8c9;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 10px solid #8B4513;
         }
 
-        .container::before {
-            content: "";
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            border: 1px solid rgba(139, 69, 19, 0.3);
-            pointer-events: none;
-        }
-
+        /* En-tête */
         header {
             text-align: center;
-            border-bottom: 3px double var(--blood);
+            border-bottom: 2px solid #8b0000;
             padding-bottom: 20px;
-            margin-bottom: 40px;
-            position: relative;
-        }
-
-        header::after {
-            content: "✠";
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--parchment);
-            padding: 0 15px;
-            color: var(--blood);
-            font-size: 20px;
+            margin-bottom: 30px;
         }
 
         h1 {
-            font-family: 'Cinzel Decorative', serif;
-            font-size: clamp(2.5rem, 5vw, 3.5rem);
-            color: var(--blood);
-            text-shadow: var(--shadow);
-            font-variant: small-caps;
-            letter-spacing: 3px;
+            color: #8b0000;
+            font-size: 2.5rem;
             margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .subtitle {
             font-style: italic;
-            font-size: 1.2em;
-            color: var(--ink);
-            letter-spacing: 1px;
+            font-size: 1.2rem;
+            color: #3a2c1a;
         }
 
+        /* Sortilèges */
         .spell {
-            margin-bottom: 50px;
-            padding: 25px;
-            background-color: rgba(242, 232, 201, 0.7);
-            border: 1px solid var(--gold);
-            box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
-            position: relative;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .spell:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(139, 69, 19, 0.1);
-        }
-
-        .spell::before {
-            content: "";
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            bottom: 5px;
-            border: 1px solid rgba(139, 69, 19, 0.2);
-            pointer-events: none;
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border: 1px solid #d4af37;
         }
 
         .spell-title {
-            font-family: 'Cinzel Decorative', serif;
-            font-size: clamp(1.5rem, 3vw, 2rem);
-            color: var(--blood);
-            border-bottom: 1px solid var(--gold);
-            padding-bottom: 10px;
-            margin-top: 0;
+            color: #8b0000;
+            font-size: 1.8rem;
             text-align: center;
-            letter-spacing: 1px;
+            margin-top: 0;
+            border-bottom: 1px solid #d4af37;
+            padding-bottom: 10px;
         }
 
         .latin {
             font-style: italic;
-            font-size: 1.3em;
-            color: var(--ink);
-            margin: 20px 0;
+            font-weight: bold;
             text-align: center;
-            font-weight: bold;
-            letter-spacing: 0.5px;
+            margin: 15px 0;
         }
 
-        .spell-details {
-            background-color: rgba(212, 175, 55, 0.05);
-            padding: 15px;
-            margin-top: 20px;
-            border-top: 1px dashed var(--gold);
-            font-size: 0.95em;
-        }
-
+        /* Avertissement */
         .warning {
-            color: var(--blood);
-            font-weight: bold;
+            background-color: rgba(139, 0, 0, 0.1);
+            border: 1px solid #8b0000;
+            color: #8b0000;
+            padding: 15px;
             text-align: center;
             margin: 30px 0;
-            padding: 15px;
-            background-color: rgba(139, 0, 0, 0.1);
-            border: 1px solid var(--blood);
-            font-size: 1.1em;
-            letter-spacing: 1px;
-            animation: pulse 2s infinite;
+            font-weight: bold;
         }
 
-        @keyframes pulse {
-            0% { opacity: 0.9; }
-            50% { opacity: 1; }
-            100% { opacity: 0.9; }
-        }
-
-        .sigil {
-            text-align: center;
-            font-size: 3em;
-            margin: 20px 0;
-            color: var(--blood);
-            filter: drop-shadow(0 0 5px rgba(139, 0, 0, 0.5));
-        }
-
+        /* Pied de page */
         footer {
             text-align: center;
-            margin-top: 50px;
+            margin-top: 40px;
             padding-top: 20px;
-            border-top: 3px double var(--blood);
+            border-top: 2px solid #8b0000;
             color: #666;
-            font-size: 0.9em;
-            position: relative;
+            font-size: 0.9rem;
         }
 
-        footer::before {
-            content: "✠";
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--parchment);
-            padding: 0 15px;
-            color: var(--blood);
-            font-size: 20px;
-        }
-
-        .ingredients {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+        /* Éléments décoratifs */
+        .sigil {
+            font-size: 2.5rem;
+            color: #8b0000;
             margin: 15px 0;
-            justify-content: center;
+            text-align: center;
         }
 
-        .ingredient {
-            background-color: rgba(139, 69, 19, 0.1);
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-        }
-
-        .ingredient:hover {
-            background-color: rgba(139, 69, 19, 0.3);
-            transform: scale(1.05);
-        }
-
-        .illustration {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid var(--ink);
-            margin: 20px auto;
-            display: block;
-            box-shadow: var(--shadow);
-            filter: sepia(0.3) contrast(1.1);
-            transition: transform 0.3s ease;
-        }
-
-        .illustration:hover {
-            transform: scale(1.02);
-            filter: sepia(0.3) contrast(1.1) brightness(1.05);
-        }
-
+        /* Responsive */
         @media (max-width: 768px) {
             .container {
-                padding: 20px;
-                margin: 10px;
-                border-width: 8px;
-            }
-
-            .spell {
                 padding: 15px;
+                border-width: 5px;
             }
-
-            .ingredients {
-                gap: 8px;
+            
+            h1 {
+                font-size: 2rem;
             }
-        }
-
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--parchment-dark);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--blood);
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #6b0000;
         }
     </style>
 </head>
@@ -266,49 +117,33 @@
         <header>
             <div class="sigil">⚯⛧✠</div>
             <h1>CODEX ARCANUM</h1>
-            <p class="subtitle">Grimoire of Ancient Secrets</p>
+            <p class="subtitle">Grimoire des Secrets Anciens</p>
         </header>
 
         <div class="warning">
-            ⚠ SOLEMN WARNING ⚠<br>
-            These formulae are historical artifacts of immeasurable power.<br>
-            Their reckless use may lead to madness, damnation, or worse.
+            ⚠ AVERTISSEMENT SOLENNEL ⚠<br>
+            Ces formules sont des artefacts historiques d'une puissance incommensurable.<br>
+            Leur utilisation imprudente peut conduire à la folie, à la damnation ou pire.
         </div>
 
         <div class="spell">
             <h2 class="spell-title">Lux Aeterna</h2>
-            <img src="https://i.imgur.com/JQlEx9P.jpg" alt="Mystical medieval light" class="illustration">
             <p class="latin">"Lux in tenebris lucet, et tenebrae eam non comprehenderunt."</p>
-            <div class="ingredients">
-                <span class="ingredient">Bougie vierge</span>
-                <span class="ingredient">Essence de camphre</span>
-                <span class="ingredient">Poudre de ver luisant</span>
-            </div>
-            <div class="spell-details">
-                <p><strong>Origin:</strong> Manuscript from the Abbey of Saint Gregory, 13th century</p>
-                <p><strong>Usage:</strong> Recite at midnight while holding a lit candle. The produced light is not physical but spiritual, revealing hidden truths.</p>
-                <p><strong>Warning:</strong> Prolonged exposure may lead to disturbing visions of parallel realities.</p>
-            </div>
+            <p><strong>Origine :</strong> Manuscrit de l'Abbaye de Saint-Grégoire, XIIIe siècle</p>
+            <p><strong>Usage :</strong> Réciter à minuit en tenant une bougie allumée. La lumière produite n'est pas physique mais spirituelle, révélant des vérités cachées.</p>
+            <p><strong>Avertissement :</strong> Une exposition prolongée peut conduire à des visions troublantes de réalités parallèles.</p>
         </div>
 
         <div class="spell">
             <h2 class="spell-title">Sigillum Protectionis</h2>
-            <img src="https://i.imgur.com/Kv1kZ8T.jpg" alt="Alchemical protection circle" class="illustration">
             <p class="latin">"Per haec sancta nomina: Tetragrammaton, Adonai, Emmanuel, Sabaoth, protege nos ab omni malo et insidia."</p>
-            <div class="ingredients">
-                <span class="ingredient">Sable noir</span>
-                <span class="ingredient">Sel béni</span>
-                <span class="ingredient">Encens de myrrhe</span>
-            </div>
-            <div class="spell-details">
-                <p><strong>Origin:</strong> Scrolls recovered from the Catacombs of Alexandria</p>
-                <p><strong>Usage:</strong> Traced in a full circle around the user. The names must be spoken aloud as the line is completed.</p>
-                <p><strong>Warning:</strong> Effect fades if the circle is broken or if intent falters.</p>
-            </div>
+            <p><strong>Origine :</strong> Parchemins retrouvés dans les Catacombes d'Alexandrie</p>
+            <p><strong>Usage :</strong> Tracer un cercle complet autour de l'utilisateur. Les noms doivent être prononcés à voix haute lorsque le cercle est complété.</p>
+            <p><strong>Avertissement :</strong> L'effet disparaît si le cercle est brisé ou si l'intention faiblit.</p>
         </div>
 
         <footer>
-            &copy; 2025 Codex Arcanum. All spells are fictitious. Use with imagination and caution.
+            &copy; 2025 Codex Arcanum. Tous les sortilèges sont fictifs. À utiliser avec imagination et prudence.
         </footer>
     </div>
 </body>

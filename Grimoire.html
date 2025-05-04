@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codex Arcanum - Grimoire des Anciens</title>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel+Decorative&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --parchment: #f2e8c9;
+            --parchment-dark: #e6d8a5;
+            --ink: #3a2c1a;
+            --blood: #8b0000;
+            --gold: #d4af37;
+        }
+        
+        body {
+            font-family: 'MedievalSharp', cursive;
+            background-color: #1a1a1a;
+            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/old_map.png');
+            color: var(--ink);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 40px;
+            background-color: var(--parchment);
+            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/paper_texture.png');
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), inset 0 0 50px rgba(139, 69, 19, 0.2);
+            border: 15px solid transparent;
+            border-image: url('https://i.imgur.com/ZYQfQ0a.png') 30 round;
+            position: relative;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px solid rgba(139, 69, 19, 0.3);
+            pointer-events: none;
+        }
+        
+        header {
+            text-align: center;
+            border-bottom: 3px double var(--blood);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        header::after {
+            content: "✠";
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--parchment);
+            padding: 0 15px;
+            color: var(--blood);
+            font-size: 20px;
+        }
+        
+        h1 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 3.5em;
+            color: var(--blood);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-variant: small-caps;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-style: italic;
+            font-size: 1.2em;
+            color: var(--ink);
+            letter-spacing: 1px;
+        }
+        
+        .spell {
+            margin-bottom: 50px;
+            padding: 25px;
+            background-color: rgba(242, 232, 201, 0.7);
+            border: 1px solid var(--gold);
+            border-radius: 0;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
+            break-inside: avoid;
+        }
+        
+        .spell::before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 1px solid rgba(139, 69, 19, 0.2);
+            pointer-events: none;
+        }
+        
+        .spell-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 2em;
+            color: var(--blood);
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 10px;
+            margin-top: 0;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        
+        .latin {
+            font-style: italic;
+            font-size: 1.3em;
+            color: var(--ink);
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        
+        .translation {
+            color: #555;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: rgba(212, 175, 55, 0.1);
+            border-left: 3px solid var(--gold);
+        }
+        
+        .illustration {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--ink);
+            margin: 20px auto;
+            display: block;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+            filter: sepia(0.3) contrast(1.1);
+        }
+        
+        .spell-details {
+            background-color: rgba(212, 175, 55, 0.05);
+            padding: 15px;
+            margin-top: 20px;
+            border-top: 1px dashed var(--gold);
+            font-size: 0.95em;
+        }
+        
+        .warning {
+            color: var(--blood);
+            font-weight: bold;
+            text-align: center;
+            margin: 30px 0;
+            padding: 15px;
+            background-color: rgba(139, 0, 0, 0.1);
+            border: 1px solid var(--blood);
+            font-size: 1.1em;
+            letter-spacing: 1px;
+        }
+        
+        .sigil {
+            text-align: center;
+            font-size: 3em;
+            margin: 20px 0;
+            color: var(--blood);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 3px double var(--blood);
+            color: #666;
+            font-size: 0.9em;
+            position: relative;
+        }
+        
+        footer::before {
+            content: "✠";
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--parchment);
+            padding: 0 15px;
+            color: var(--blood);
+            font-size: 20px;
+        }
+        
+        .ingredients {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+        
+        .ingredient {
+            background-color: rgba(139, 69, 19, 0.1);
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+                border-width: 8px;
+            }
+            
+            h1 {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="sigil">⚯⛧✠</div>
+            <h1>CODEX ARCANUM</h1>
+            <p class="subtitle">Grimoire des Anciens Secrets</p>
+        </header>
+        
+        <div class="warning">
+            ⚠ AVERTISSEMENT SOLENNEL ⚠<br>
+            Ces formules sont des artefacts historiques de puissance incommensurable.<br>
+            Leur usage inconsidéré peut conduire à la folie, la damnation ou pire encore.
+        </div>
+        
+        <div class="spell">
+            <h2 class="spell-title">Lux Aeterna</h2>
+            <img src="https://i.imgur.com/JQlEx9P.jpg" alt="Lumière mystique médiévale" class="illustration">
+            <p class="latin">"Lux in tenebris lucet, et tenebrae eam non comprehenderunt."</p>
+            <p class="translation">"La lumière brille dans les ténèbres, et les ténèbres ne l'ont point comprise."</p>
+            <div class="ingredients">
+                <span class="ingredient">Bougie vierge</span>
+                <span class="ingredient">Essence de camphre</span>
+                <span class="ingredient">Poudre de ver luisant</span>
+            </div>
+            <div class="spell-details">
+                <p><strong>Origine:</strong> Manuscrit de l'Abbaye de Saint-Grégoire, XIIIe siècle</p>
+                <p><strong>Usage:</strong> Réciter à minuit en tenant une bougie allumée. La lumière produite n'est pas physique mais spirituelle, révélant les vérités cachées.</p>
+                <p><strong>Avertissement:</strong> Une exposition prolongée peut mener à des visions troublantes de réalités parallèles.</p>
+            </div>
+        </div>
+        
+        <div class="spell">
+            <h2 class="spell-title">Sigillum Protectionis</h2>
+            <img src="https://i.imgur.com/Kv1kZ8T.jpg" alt="Cercle de protection alchimique" class="illustration">
+            <p class="latin">"Per haec sancta nomina: Tetragrammaton, Adonai, Emmanuel, Sabaoth, protege nos ab omni malo et insidia diaboli."</p>
+            <p class="translation">"Par ces noms sacrés: Tétragrammaton, Adonaï, Emmanuel, Sabaoth, protège-nous de tout mal et des pièges du diable."</p>
+            <div class="ingredients">
+                <span class="ingredient">Craie consacrée</span>
+                <span class="ingredient">Sel gemme</span>
+                <span class="ingredient">Sang de colombe (optionnel)</span>
+            </div>
+            <div class="spell-details">
+                <p><strong>Origine:</strong> Grimoire d'Honorius, version du XVe siècle</p>
+                <p><strong>Usage:</strong> Tracer le cercle dans le sens solaire en prononçant chaque mot avec conviction. Ne jamais briser le cercle avant la fin du rituel.</p>
+                <p><strong>Avertissement:</strong> Une prononciation incorrecte des noms sacrés peut attirer l'attention d'entités indésirables.</p>
+            </div>
+        </div>
+        
+        <div class="spell">
+            <h2 class="spell-title">Evocatio Spiritum</h2>
+            <img src="https://i.imgur.com/pLmD4QJ.jpg" alt="Invocation des esprits médiévale" class="illustration">
+            <p class="latin">"Spiritus sapientiae et intellectus, spiritus consilii et fortitudinis, spiritus scientiae et pietatis, adesto nobis."</p>
+            <p class="translation">"Esprit de sagesse et d'intelligence, esprit de conseil et de force, esprit de science et de piété, sois présent avec nous."</p>
+            <div class="ingredients">
+                <span class="ingredient">Encens de myrrhe</span>
+                <span class="ingredient">Miroir en obsidienne</span>
+                <span class="ingredient">Eau bénite de source lunaire</span>
+            </div>
+            <div class="spell-details">
+                <p><strong>Origine:</strong> Livre d'Abramelin, traduction médiévale</p>
+                <p><strong>Usage:</strong> Effectuer uniquement durant la pleine lune. Préparer un triangle d'invocation et placer le miroir en son centre.</p>
+                <p><strong>Avertissement:</strong> Ne jamais poser de questions personnelles aux entités invoquées. Leur savoir dépasse notre entendement.</p>
+            </div>
+        </div>
+        
+        <div class="spell">
+            <h2 class="spell-title">Sanatio Arcana</h2>
+            <img src="https://i.imgur.com/qXQZz9f.jpg" alt="Rituel de guérison ancien" class="illustration">
+            <p class="latin">"Per virtutem Dei vivi, percutio hanc infirmitatem, tero hanc corruptionem, expello hanc pestem in nomine Patris, et Filii, et Spiritus Sancti."</p>
+            <p class="translation">"Par la vertu du Dieu vivant, je frappe cette infirmité, je broie cette corruption, je chasse cette peste au nom du Père, du Fils et du Saint-Esprit."</p>
+            <div class="ingredients">
+                <span class="ingredient">Herbe de Saint-Jean</span>
+                <span class="ingredient">Ail sauvage</span>
+                <span class="ingredient">Poudre d'émeraude</span>
+            </div>
+            <div class="spell-details">
+                <p><strong>Origine:</strong> Manuscrit de la Bibliothèque de l'Arsenal, Paris</p>
+                <p><strong>Usage:</strong> Appliquer les ingrédients sur la zone affectée tout en récitant la formule. Répéter pendant trois jours consécutifs.</p>
+                <p><strong>Avertissement:</strong> Cette formule ne remplace pas un traitement médical. Les maladies graves nécessitent l'intervention de la médecine moderne.</p>
+            </div>
+        </div>
+        
+        <div class="spell">
+            <h2 class="spell-title">Veritas Occulta</h2>
+            <img src="https://i.imgur.com/8nJYV7E.jpg" alt="Miroir magique de vérité" class="illustration">
+            <p class="latin">"Speculum veritatis, revela quod absconditum est. Ostende mihi quod scire desidero, sine fraude, sine dolo."</p>
+            <p class="translation">"Miroir de vérité, révèle ce qui est caché. Montre-moi ce que je désire savoir, sans fraude, sans tromperie."</p>
+            <div class="ingredients">
+                <span class="ingredient">Miroir en argent</span>
+                <span class="ingredient">Huile de lampe</span>
+                <span class="ingredient">Plume de corbeau</span>
+            </div>
+            <div class="spell-details">
+                <p><strong>Origine:</strong> Grimoire du Pape Honorius, version secrète</p>
+                <p><strong>Usage:</strong> Enduire le miroir d'huile et écrire la question avec la plume. Observer à la lueur d'une chandelle entre minuit et 3h du matin.</p>
+                <p><strong>Avertissement:</strong> La vérité révélée peut être difficile à accepter. Ne posez jamais de questions dont vous ne voulez pas connaître la réponse.</p>
+            </div>
+        </div>
+        
+        <div class="sigil">⚯⛧✠</div>
+        
+        <footer>
+            <p>CODEX ARCANUM - Manuscrit scellé en 1432 - Copie interdite sans autorisation</p>
+            <p>Ce grimoire appartient à la Bibliothèque des Ombres. Toute reproduction ou utilisation non autorisée sera punie par les lois divines et humaines.</p>
+        </footer>
+    </div>
+</body>
+</html>

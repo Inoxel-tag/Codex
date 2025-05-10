@@ -13,20 +13,27 @@
             --sang: #8b0000;
             --or: #d4af37;
             --ombre: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            --tache: rgba(139, 0, 0, 0.15);
         }
 
         /* Base */
         body {
-            font-family: 'Times New Roman', serif;
-            background-color: #222;
+            font-family: 'MedievalSharp', 'Times New Roman', serif;
+            background-color: #111;
             background-image: 
-                linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-                repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(139, 69, 19, 0.1) 1px, rgba(139, 69, 19, 0.1) 2px);
+                url('https://www.transparenttextures.com/patterns/black-paper.png'),
+                linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9));
             color: var(--encre);
             margin: 0;
             padding: 20px;
             line-height: 1.6;
             min-height: 100vh;
+        }
+
+        /* Effet de parchemin vieilli */
+        @keyframes tache {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
         }
 
         /* Conteneur principal */
@@ -37,11 +44,13 @@
             background-color: var(--parchemin);
             background-image: 
                 linear-gradient(rgba(242, 232, 201, 0.8), rgba(242, 232, 201, 0.8)),
-                repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(139, 69, 19, 0.1) 29px, rgba(139, 69, 19, 0.1) 30px);
+                repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(139, 69, 19, 0.1) 29px, rgba(139, 69, 19, 0.1) 30px),
+                radial-gradient(ellipse at 20% 30%, var(--tache) 0%, transparent 30%),
+                radial-gradient(ellipse at 80% 70%, var(--tache) 0%, transparent 30%);
             box-shadow: 
                 0 0 30px rgba(0, 0, 0, 0.7),
                 inset 0 0 50px rgba(139, 69, 19, 0.2);
-            border: 12px solid transparent;
+            border: 15px solid;
             border-image: 
                 linear-gradient(
                     to bottom right,
@@ -51,10 +60,10 @@
                     var(--or) 60%,
                     var(--sang) 80%,
                     var(--encre) 100%
-                );
-            border-image-slice: 1;
+                ) 1;
             position: relative;
-            line-height: 30px;
+            line-height: 1.8;
+            animation: tache 60s linear infinite;
         }
 
         .grimoire::before {
@@ -90,19 +99,17 @@
         }
 
         .titre {
-            font-family: 'Times New Roman', serif;
-            font-size: 3.5rem;
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 4rem;
             color: var(--sang);
             text-shadow: var(--ombre);
-            font-variant: small-caps;
             letter-spacing: 4px;
             margin-bottom: 15px;
-            text-transform: uppercase;
         }
 
         .sous-titre {
             font-style: italic;
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             color: var(--encre);
             letter-spacing: 1.5px;
         }
@@ -110,11 +117,12 @@
         /* Sigil */
         .sigil {
             text-align: center;
-            font-size: 3.5rem;
+            font-size: 4rem;
             margin: 25px 0;
             color: var(--sang);
-            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+            text-shadow: 0 0 15px rgba(139, 0, 0, 0.7);
             line-height: 1;
+            filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.5));
         }
 
         /* Avertissement */
@@ -123,21 +131,24 @@
             font-weight: bold;
             text-align: center;
             margin: 40px 0;
-            padding: 20px;
+            padding: 25px;
             background-color: rgba(139, 0, 0, 0.1);
             border: 1px solid var(--sang);
-            font-size: 1.1rem;
+            border-left: 15px solid var(--sang);
+            font-size: 1.2rem;
             letter-spacing: 1px;
             position: relative;
+            font-variant: small-caps;
         }
 
         .avertissement::before,
         .avertissement::after {
-            content: "⚠";
+            content: "✠";
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1.5rem;
+            font-size: 2rem;
+            color: var(--sang);
         }
 
         .avertissement::before {
@@ -150,22 +161,23 @@
 
         /* Sortilèges */
         .sortilege {
-            margin-bottom: 60px;
-            padding: 30px;
-            background-color: rgba(242, 232, 201, 0.6);
+            margin-bottom: 80px;
+            padding: 35px;
+            background-color: rgba(242, 232, 201, 0.5);
             border: 1px solid var(--or);
             box-shadow: 
-                inset 0 0 20px rgba(139, 69, 19, 0.1),
-                0 5px 15px rgba(0, 0, 0, 0.1);
+                inset 0 0 30px rgba(139, 69, 19, 0.1),
+                0 5px 20px rgba(0, 0, 0, 0.15);
             position: relative;
             transition: all 0.3s ease;
+            break-inside: avoid;
         }
 
         .sortilege:hover {
             transform: translateY(-5px);
             box-shadow: 
-                inset 0 0 20px rgba(139, 69, 19, 0.2),
-                0 10px 25px rgba(0, 0, 0, 0.2);
+                inset 0 0 30px rgba(139, 69, 19, 0.2),
+                0 10px 30px rgba(0, 0, 0, 0.25);
         }
 
         .sortilege::before {
@@ -180,51 +192,56 @@
         }
 
         .titre-sortilege {
-            font-family: 'Times New Roman', serif;
-            font-size: 2.2rem;
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 2.5rem;
             color: var(--sang);
-            border-bottom: 1px solid var(--or);
+            border-bottom: 2px solid var(--or);
             padding-bottom: 15px;
             margin-top: 0;
             text-align: center;
             letter-spacing: 2px;
-            font-variant: small-caps;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
 
         .latin {
             font-style: italic;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             color: var(--encre);
-            margin: 25px 0;
+            margin: 30px 0;
             text-align: center;
             font-weight: bold;
             letter-spacing: 0.5px;
             position: relative;
+            font-family: 'Times New Roman', serif;
         }
 
         .latin::before,
         .latin::after {
-            content: "❧";
+            content: "❦";
             color: var(--sang);
-            padding: 0 10px;
+            padding: 0 15px;
+            font-size: 1.8rem;
+            vertical-align: middle;
         }
 
         /* Ingrédients */
         .ingredients {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            margin: 20px 0;
+            gap: 15px;
+            margin: 25px 0;
             justify-content: center;
         }
 
         .ingredient {
             background-color: rgba(139, 69, 19, 0.1);
-            padding: 8px 15px;
+            padding: 10px 20px;
             border-radius: 3px;
-            font-size: 0.95rem;
+            font-size: 1rem;
             border: 1px dashed var(--or);
             transition: all 0.3s ease;
+            position: relative;
+            font-variant: small-caps;
         }
 
         .ingredient:hover {
@@ -232,33 +249,116 @@
             transform: scale(1.05);
         }
 
+        .ingredient::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 10%;
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--or), transparent);
+        }
+
+        /* Formules magiques */
+        .formule {
+            font-family: 'Courier New', monospace;
+            background-color: rgba(58, 44, 26, 0.1);
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 5px solid var(--sang);
+            position: relative;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .formule::before {
+            content: "↯";
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            font-size: 2rem;
+            color: var(--sang);
+        }
+
+        /* Étapes rituelles */
+        .rituel {
+            counter-reset: etape;
+            margin: 30px 0;
+        }
+
+        .etape {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 20px;
+            min-height: 40px;
+        }
+
+        .etape::before {
+            counter-increment: etape;
+            content: counter(etape);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 35px;
+            height: 35px;
+            background: var(--sang);
+            color: var(--parchemin);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
         /* Détails du sort */
         .details-sort {
             background-color: rgba(212, 175, 55, 0.05);
-            padding: 20px;
-            margin-top: 25px;
-            border-top: 1px dashed var(--or);
-            font-size: 1rem;
+            padding: 25px;
+            margin-top: 30px;
+            border-top: 2px dashed var(--or);
+            font-size: 1.05rem;
             position: relative;
         }
 
         .details-sort::before {
-            content: "⋆";
+            content: "✧";
             position: absolute;
-            top: -12px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
             background: var(--parchemin);
-            padding: 0 15px;
+            padding: 0 20px;
             color: var(--or);
-            font-size: 20px;
+            font-size: 24px;
+        }
+
+        .details-sort h3 {
+            color: var(--sang);
+            border-bottom: 1px dotted var(--or);
+            padding-bottom: 5px;
+            font-variant: small-caps;
+            letter-spacing: 1px;
+        }
+
+        /* Notes marginales */
+        .note {
+            position: absolute;
+            right: -100px;
+            width: 90px;
+            padding: 10px;
+            background: rgba(242, 232, 201, 0.9);
+            border: 1px solid var(--or);
+            font-size: 0.8rem;
+            box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+            transform: rotate(3deg);
         }
 
         /* Pied de page */
         .footer {
             text-align: center;
-            margin-top: 60px;
-            padding-top: 25px;
+            margin-top: 80px;
+            padding-top: 30px;
             border-top: 3px double var(--sang);
             color: var(--encre);
             font-size: 0.9rem;
@@ -266,26 +366,36 @@
         }
 
         .footer::before {
-            content: "✠";
+            content: "⚷";
             position: absolute;
-            top: -18px;
+            top: -22px;
             left: 50%;
             transform: translateX(-50%);
             background: var(--parchemin);
-            padding: 0 20px;
+            padding: 0 25px;
             color: var(--sang);
-            font-size: 24px;
+            font-size: 28px;
         }
 
         /* Effets spéciaux */
         @keyframes clignotement {
-            0% { opacity: 0.8; }
+            0% { opacity: 0.7; }
             50% { opacity: 1; }
-            100% { opacity: 0.8; }
+            100% { opacity: 0.7; }
         }
 
         .clignotant {
-            animation: clignotement 2s infinite;
+            animation: clignotement 3s infinite;
+        }
+
+        @keyframes pulsation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .pulsant {
+            animation: pulsation 10s infinite;
         }
 
         /* Barre de défilement */
@@ -312,7 +422,7 @@
             }
             
             .titre {
-                font-size: 2.5rem;
+                font-size: 2.8rem;
             }
             
             .sortilege {
@@ -320,84 +430,261 @@
             }
             
             .titre-sortilege {
-                font-size: 1.8rem;
+                font-size: 2rem;
+            }
+            
+            .note {
+                position: static;
+                width: auto;
+                margin: 10px 0;
+                transform: none;
             }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="grimoire">
+    <div class="grimoire pulsant">
         <header class="header">
-            <div class="sigil">⚯⛧✠</div>
+            <div class="sigil">⚯⛧⚕</div>
             <h1 class="titre">Codex Arcanum</h1>
-            <p class="sous-titre">Grimoire des Secrets Oubliés</p>
+            <p class="sous-titre">Liber Secretorum Aeternum</p>
         </header>
 
         <div class="avertissement clignotant">
             MISE EN GARDE OCCULTE<br>
-            Ces connaissances interdites ne sont pas destinées aux âmes fragiles.<br>
-            L'usage de ces formules engage l'âme et la postérité du praticien.
+            <em>"Qui intrat hic, relinquat omnem spem"</em><br>
+            Ces formules scellées ne doivent être révélées qu'aux initiés du Cercle Intérieur
         </div>
 
+        <!-- Premier sortilège -->
         <div class="sortilege">
             <h2 class="titre-sortilege">Lux Aeterna</h2>
             <p class="latin">"Lux in tenebris lucet, et tenebrae eam non comprehenderunt."</p>
             
+            <div class="note">Consulter le folio XXVII pour les variantes lunaire</div>
+            
             <div class="ingredients">
-                <span class="ingredient">Bougie vierge</span>
-                <span class="ingredient">Essence de camphre</span>
-                <span class="ingredient">Poudre de ver luisant</span>
-                <span class="ingredient">Larme de phénix</span>
+                <span class="ingredient">Bougie vierge de cire d'abeille</span>
+                <span class="ingredient">Essence de camphre purifié</span>
+                <span class="ingredient">Poudre de ver luisant (7 spécimens)</span>
+                <span class="ingredient">Larme de phénix cristallisée</span>
+                <span class="ingredient">Mercure philosophique (3 gouttes)</span>
+            </div>
+            
+            <div class="formule">
+                <strong>Formule d'incantation:</strong><br>
+                "Per ignem aeternum et lumen indeficiens,<br>
+                revela quod occultum est,<br>
+                dissolve quod fictum est,<br>
+                ostende veritatem sub luce tua perpetua!"
+            </div>
+            
+            <div class="rituel">
+                <h3>Rituel de Conjuration:</h3>
+                <div class="etape">Préparer le cercle de conjuration avec les cinq pointes orientées vers les étoiles fixes</div>
+                <div class="etape">Disposer les bougies aux points cardinaux (noire au nord, blanche à l'est, rouge au sud, bleue à l'ouest)</div>
+                <div class="etape">Mélanger les ingrédients dans un mortier d'argent sous la lumière de la lune noire</div>
+                <div class="etape">Réciter l'incantation en tournant dans le sens solaire (deosil) autour du cercle</div>
+                <div class="etape">Allumer la bougie centrale avec une flamme volée (feu non allumé par main humaine)</div>
             </div>
             
             <div class="details-sort">
-                <p><strong>Origine:</strong> Manuscrit scellé de l'Abbaye de Saint-Grégoire le Thaumaturge, 1247</p>
-                <p><strong>Invocation:</strong> À réciter lors de la pleine lune noire, entre minuit et l'heure la plus sombre, tenant une bougie d'abeille vierge allumée avec la main gauche.</p>
-                <p><strong>Effet:</strong> La lumière produite n'éclaire pas le monde matériel mais révèle les vérités cachées, les mensonges tissés et les réalités parallèles qui frôlent la nôtre.</p>
-                <p><strong>Avertissement:</strong> Une exposition prolongée peut conduire à la confusion permanente entre les mondes, avec des cas documentés de praticiens ayant perdu la capacité de distinguer la réalité de la vision.</p>
+                <h3>Origine:</h3>
+                <p>Manuscrit scellé de l'Abbaye de Saint-Grégoire le Thaumaturge, 1247. Transcrit d'après des fragments du <em>Liber de Lumine</em> attribué à Hermès Trismégiste.</p>
+                
+                <h3>Effets:</h3>
+                <p>La lumière produite révèle:</p>
+                <ul>
+                    <li>Les mensonges et illusions</li>
+                    <li>Les entités invisibles</li>
+                    <li>Les traces magiques récentes (jusqu'à 7 jours)</li>
+                    <li>Les objets enchantés</li>
+                </ul>
+                
+                <h3>Avertissements:</h3>
+                <p>L'usage prolongé peut provoquer:</p>
+                <ul>
+                    <li>Confusion entre les réalités (Syndrome de Penthésilée)</li>
+                    <li>Perte de la vision normale (Cécité aeterna)</li>
+                    <li>Attraction d'entités photophages</li>
+                </ul>
+                
+                <h3>Contremesures:</h3>
+                <p>En cas de possession lumineuse, appliquer un onguent de terre sacrée sur les paupières et réciter le <em>Psaume 23</em> à l'envers.</p>
             </div>
         </div>
 
+        <!-- Deuxième sortilège -->
         <div class="sortilege">
             <h2 class="titre-sortilege">Sigillum Protectionis</h2>
             <p class="latin">"Per haec sancta nomina: Tetragrammaton, Adonai, Emmanuel, Sabaoth, protege nos ab omni malo et insidia."</p>
             
+            <div class="note">Ne pas utiliser lors des éclipses</div>
+            
             <div class="ingredients">
-                <span class="ingredient">Sable des tombeaux</span>
-                <span class="ingredient">Sel exorcisé</span>
+                <span class="ingredient">Sable des sept tombeaux</span>
+                <span class="ingredient">Sel exorcisé (bénit par 3 religions)</span>
                 <span class="ingredient">Encens de myrrhe noire</span>
-                <span class="ingredient">Sang du praticien</span>
+                <span class="ingredient">Sang du praticien (3 gouttes)</span>
+                <span class="ingredient">Plume de corbeau albinos</span>
+            </div>
+            
+            <div class="formule">
+                <strong>Formule d'activation:</strong><br>
+                "Per virtutem Dei vivi,<br>
+                per potentiam Dei veri,<br>
+                per amorem Dei sancti,<br>
+                hoc sigillum sit murus fortis<br>
+                contra omnes malignos spiritus!"
+            </div>
+            
+            <div class="rituel">
+                <h3>Rituel de Protection:</h3>
+                <div class="etape">Tracer le cercle avec le poignard rituel (main gauche pour les initiés, droite pour les novices)</div>
+                <div class="etape">Inscrire les noms sacrés aux quatre points cardinaux</div>
+                <div class="etape">Saupoudrer le mélange sel/sable en récitant les noms des archanges</div>
+                <div class="etape">Allumer l'encens aux trois points de la Trinité</div>
+                <div class="etape">Sceller avec le sang en formant le pentagramme de protection</div>
             </div>
             
             <div class="details-sort">
-                <p><strong>Origine:</strong> Parchemins scellés découverts dans la Chambre Secrète des Catacombes d'Alexandrie, traduits par Albert le Grand en 1262</p>
-                <p><strong>Invocation:</strong> Le cercle doit être tracé dans le sens solaire avec un poignard consacré. Chaque nom divin doit être prononcé lorsque la lame touche le sol, avec une intention pure.</p>
-                <p><strong>Effet:</strong> Crée une barrière impénétrable contre les entités malveillantes, les malédictions et les influences psychiques. Les témoignages médiévaux rapportent que le cercle résista à une horde de démons pendant sept jours et sept nuits.</p>
-                <p><strong>Avertissement:</strong> Le cercle perd instantanément son pouvoir s'il est rompu physiquement ou si le praticien doute de sa protection. Plusieurs cas de possession ont été rapportés suite à une faille dans le cercle.</p>
+                <h3>Origine:</h3>
+                <p>Parchemins scellés découverts dans la Chambre Secrète des Catacombes d'Alexandrie, traduits par Albert le Grand en 1262. Basé sur des formules attribuées au roi Salomon.</p>
+                
+                <h3>Effets:</h3>
+                <ul>
+                    <li>Barrière contre les entités malveillantes (niveau 7 selon l'échelle de Binsfeld)</li>
+                    <li>Protection contre les malédictions et envoûtements</li>
+                    <li>Détection des intentions hostiles</li>
+                    <li>Purification de l'espace sacré</li>
+                </ul>
+                
+                <h3>Avertissements:</h3>
+                <ul>
+                    <li>Le cercle se rompt si le praticien en sort volontairement</li>
+                    <li>Ne pas utiliser plus de 7 nuits consécutives</li>
+                    <li>Contre-indiqué pour les femmes enceintes</li>
+                </ul>
+                
+                <h3>Variantes:</h3>
+                <p>Pour une protection permanente, mélanger les ingrédients avec du mortier et inscrire sur le linteau de la porte avec la plume.</p>
             </div>
         </div>
 
+        <!-- Troisième sortilège -->
         <div class="sortilege">
             <h2 class="titre-sortilege">Verbum Mortis</h2>
             <p class="latin">"Mors vincit omnia, et nos cedamus morti."</p>
             
+            <div class="note">Interdit par le Concile de Lyon, 1274</div>
+            
             <div class="ingredients">
-                <span class="ingredient">Poussière de crâne</span>
-                <span class="ingredient">Cire de cierge funéraire</span>
-                <span class="ingredient">Souche d'if</span>
-                <span class="ingredient">Souffle du dernier mot</span>
+                <span class="ingredient">Poussière de crâne (nécromant certifié)</span>
+                <span class="ingredient">Cire de cierge funéraire (brûlé pendant les obsèques)</span>
+                <span class="ingredient">Souche d'if millénaire</span>
+                <span class="ingredient">Souffle du dernier mot (capturé dans un miroir noir)</span>
+                <span class="ingredient">Sang lunaire (recueilli pendant une éclipse)</span>
+            </div>
+            
+            <div class="formule">
+                <strong>Formule d'évocation:</strong><br>
+                "Per portas mortis et umbram aeternam,<br>
+                voco te, (nom du défunt),<br>
+                per sanguinem meum et ossa tua,<br>
+                responde mihi veritatem post mortem!"
+            </div>
+            
+            <div class="rituel">
+                <h3>Rituel Nécromantique:</h3>
+                <div class="etape">Modeler une effigie avec la cire et la poussière de crâne</div>
+                <div class="etape">Graver le nom du défunt avec la souche d'if</div>
+                <div class="etape">Disposer trois miroirs en triangle autour de l'effigie</div>
+                <div class="etape">Réciter l'incantation à minuit en tenant le miroir noir</div>
+                <div class="etape">Sceller le pacte avec une goutte de sang sur les lèvres de l'effigie</div>
             </div>
             
             <div class="details-sort">
-                <p><strong>Origine:</strong> Fragment du Livre d'Eibon, copié par Théodoric de Vérone en 1289 à partir d'un original perdu</p>
-                <p><strong>Invocation:</strong> À murmurer dans l'oreille d'une effigie en cire contenant les reliques du défunt, lors du coucher du soleil lorsque Vénus est visible.</p>
-                <p><strong>Effet:</strong> Permet un bref dialogue avec les trépassés, bien que les textes mettent en garde contre les réponses trompeuses. Certains praticiens rapportent avoir obtenu des connaissances interdites.</p>
-                <p><strong>Avertissement:</strong> 19 des 23 praticiens documentés dans les Annales Occultes sont morts dans l'année suivant l'invocation, souvent dans des circonstances mystérieuses. Les 4 survivants sont devenus fous.</p>
+                <h3>Origine:</h3>
+                <p>Fragment du <em>Livre d'Eibon</em>, copié par Théodoric de Vérone en 1289 à partir d'un original perdu. Mentionné dans les procès-verbaux de l'Inquisition comme "Sortilège de Classe VII - Interdit".</p>
+                
+                <h3>Effets:</h3>
+                <ul>
+                    <li>Communication avec les trépassés (durée limitée à 13 minutes)</li>
+                    <li>Accès à la connaissance des ancêtres</li>
+                    <li>Vision des événements passés</li>
+                    <li>Possibilité de poser 3 questions (selon la Loi de Triplicité)</li>
+                </ul>
+                
+                <h3>Avertissements:</h3>
+                <ul>
+                    <li>19 des 23 praticiens documentés sont morts dans l'année</li>
+                    <li>Les 4 survivants ont développé une héméralopie permanente</li>
+                    <li>Risque de possession par l'esprit évoqué</li>
+                    <li>Interdit par les Conventions Arcaniques de 1283</li>
+                </ul>
+                
+                <h3>Contremesures:</h3>
+                <p>En cas de possession, brûler l'effigie avec du sel gemme tout en récitant le <em>Libera Me</em>. Consulter immédiatement un exorciste agréé.</p>
+            </div>
+        </div>
+
+        <!-- Quatrième sortilège (nouveau) -->
+        <div class="sortilege">
+            <h2 class="titre-sortilege">Amor Aeternus</h2>
+            <p class="latin">"Per amorem vincit omnia, et nos cedamus amori."</p>
+            
+            <div class="note">Double effet si réalisé à la Saint-Valentin</div>
+            
+            <div class="ingredients">
+                <span class="ingredient">Rose rouge cueillie à minuit</span>
+                <span class="ingredient">Miel de lune (première récolte)</span>
+                <span class="ingredient">Sang menstruel (optionnel)</span>
+                <span class="ingredient">Cheveu de la cible</span>
+                <span class="ingredient">Poudre de perle vierge</span>
+            </div>
+            
+            <div class="formule">
+                <strong>Formule d'envoûtement:</strong><br>
+                "Per cor meum et cor tuum,<br>
+                per sanguinem et spiritum,<br>
+                sit nostra connexio<br>
+                firmior morte, dulcior vita!"
+            </div>
+            
+            <div class="rituel">
+                <h3>Rituel d'Envoûtement:</h3>
+                <div class="etape">Tresser le cheveu avec un fil rouge et la rose</div>
+                <div class="etape">Enduire de miel et saupoudrer de perle</div>
+                <div class="etape">Enterrer sous un rosier en pleine lune</div>
+                <div class="etape">Réciter l'incantation en tenant l'amulette contre son cœur</div>
+                <div class="etape">Offrir un cadeau à la cible dans les 3 jours</div>
+            </div>
+            
+            <div class="details-sort">
+                <h3>Origine:</h3>
+                <p>Transmis par les sorcières de Thessalie, adapté par Marie la Juive dans son <em>Grimoire des Passions</em> (XIIIe siècle).</p>
+                
+                <h3>Effets:</h3>
+                <ul>
+                    <li>Attirance immédiate (24-72 heures)</li>
+                    <li>Lien émotionnel durable (3-7 ans)</li>
+                    <li>Protection contre les rivales</li>
+                    <li>Rêves partagés (après 7 nuits)</li>
+                </ul>
+                
+                <h3>Avertissements:</h3>
+                <ul>
+                    <li>Effet inverse si la cible est protégée</li>
+                    <li>Peut provoquer une obsession maladive</li>
+                    <li>Interdit par le Canon Ecclésiastique</li>
+                </ul>
             </div>
         </div>
 
         <footer class="footer">
             &copy; Anno MCMXXIV - Ce Codex est la propriété de l'Ordre des Veilleurs Noirs.<br>
+            <em>"Qui revelat arcana perdet oculos suos"</em><br>
             La reproduction non autorisée est punie par les lois divines et humaines.
         </footer>
     </div>

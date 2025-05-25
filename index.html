@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codex Arcanum - Grimoire Occulte</title>
+    <title>Codex Arcanum - Grimoire Occulte 3D</title>
     <style>
         /* Variables CSS */
         :root {
@@ -34,6 +34,7 @@
             line-height: 1.6;
             min-height: 100vh;
             overflow-x: hidden;
+            perspective: 1500px;
         }
 
         /* Effets de vieillissement */
@@ -43,9 +44,19 @@
         }
 
         /* Conteneur principal */
-        .grimoire {
+        .grimoire-container {
             max-width: 900px;
-            margin: 30px auto;
+            margin: 50px auto;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+
+        .grimoire-container:hover {
+            transform: rotateY(-5deg) rotateX(3deg);
+        }
+
+        .grimoire {
             padding: 40px 60px;
             background-color: var(--parchemin);
             background-image: 
@@ -72,10 +83,63 @@
             position: relative;
             line-height: 1.8;
             animation: tache 60s linear infinite;
-            transform: rotate(0.5deg);
+            transform: rotateY(0deg) rotateX(0deg) rotateZ(0.5deg);
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            z-index: 1;
         }
 
+        .grimoire:hover {
+            transform: rotateY(-5deg) rotateX(3deg) rotateZ(0.5deg);
+            box-shadow: 
+                0 10px 50px rgba(0, 0, 0, 0.9),
+                20px 0 50px rgba(139, 0, 0, 0.3),
+                inset 0 0 50px rgba(139, 69, 19, 0.2);
+        }
+
+        /* Effet 3D - Côté du livre */
         .grimoire::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: -15px;
+            width: 30px;
+            height: 100%;
+            background: linear-gradient(to left, 
+                #8b4513 0%, 
+                #a0522d 20%, 
+                #8b4513 40%, 
+                #cd853f 60%, 
+                #8b4513 80%, 
+                #5d3a1a 100%);
+            transform: rotateY(90deg) translateX(15px);
+            transform-origin: left center;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        /* Effet 3D - Tranche du livre */
+        .grimoire::after {
+            content: "";
+            position: absolute;
+            top: -15px;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(to bottom, 
+                #8b4513 0%, 
+                #a0522d 20%, 
+                #8b4513 40%, 
+                #cd853f 60%, 
+                #8b4513 80%, 
+                #5d3a1a 100%);
+            transform: rotateX(90deg) translateY(15px);
+            transform-origin: center bottom;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .grimoire-inner::before {
             content: "";
             position: absolute;
             top: 15px;
@@ -86,7 +150,7 @@
             pointer-events: none;
         }
 
-        .grimoire::after {
+        .grimoire-inner::after {
             content: "";
             position: absolute;
             top: 0;
@@ -152,6 +216,7 @@
             letter-spacing: 4px;
             margin-bottom: 15px;
             position: relative;
+            transform: translateZ(20px);
         }
 
         .titre::before {
@@ -170,6 +235,7 @@
             color: var(--encre);
             letter-spacing: 1.5px;
             text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+            transform: translateZ(15px);
         }
 
         /* Sigil */
@@ -181,7 +247,7 @@
             text-shadow: 0 0 15px rgba(139, 0, 0, 0.7);
             line-height: 1;
             filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.5));
-            transform: rotate(-2deg);
+            transform: rotate(-2deg) translateZ(30px);
         }
 
         /* Avertissement */
@@ -198,7 +264,7 @@
             letter-spacing: 1px;
             position: relative;
             font-variant: small-caps;
-            transform: rotate(-0.5deg);
+            transform: rotate(-0.5deg) translateZ(20px);
             box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
         }
 
@@ -233,15 +299,15 @@
             position: relative;
             transition: all 0.3s ease;
             break-inside: avoid;
-            transform: rotate(0.3deg);
+            transform: rotate(0.3deg) translateZ(10px);
         }
 
         .sortilege:nth-child(even) {
-            transform: rotate(-0.3deg);
+            transform: rotate(-0.3deg) translateZ(10px);
         }
 
         .sortilege:hover {
-            transform: translateY(-5px) rotate(0.3deg) !important;
+            transform: translateY(-5px) rotate(0.3deg) translateZ(20px) !important;
             box-shadow: 
                 inset 0 0 30px rgba(139, 69, 19, 0.2),
                 0 10px 30px rgba(0, 0, 0, 0.25);
@@ -281,6 +347,7 @@
             letter-spacing: 2px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
             position: relative;
+            transform: translateZ(15px);
         }
 
         .titre-sortilege::after {
@@ -303,7 +370,7 @@
             letter-spacing: 0.5px;
             position: relative;
             font-family: 'Times New Roman', serif;
-            transform: rotate(-0.5deg);
+            transform: rotate(-0.5deg) translateZ(10px);
         }
 
         .latin::before,
@@ -334,16 +401,16 @@
             transition: all 0.3s ease;
             position: relative;
             font-variant: small-caps;
-            transform: rotate(0.5deg);
+            transform: rotate(0.5deg) translateZ(5px);
         }
 
         .ingredient:nth-child(even) {
-            transform: rotate(-0.5deg);
+            transform: rotate(-0.5deg) translateZ(5px);
         }
 
         .ingredient:hover {
             background-color: rgba(139, 69, 19, 0.3);
-            transform: scale(1.05) rotate(0.5deg) !important;
+            transform: scale(1.05) rotate(0.5deg) translateZ(10px) !important;
         }
 
         .ingredient::after {
@@ -366,7 +433,7 @@
             position: relative;
             font-size: 1.1rem;
             line-height: 1.8;
-            transform: rotate(0.3deg);
+            transform: rotate(0.3deg) translateZ(15px);
             box-shadow: inset 3px 0 5px -3px rgba(0,0,0,0.2);
         }
 
@@ -393,6 +460,7 @@
         .rituel {
             counter-reset: etape;
             margin: 30px 0;
+            transform: translateZ(10px);
         }
 
         .etape {
@@ -419,6 +487,7 @@
             font-weight: bold;
             font-size: 1.2rem;
             box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            transform: translateZ(5px);
         }
 
         /* Détails du sort */
@@ -429,7 +498,7 @@
             border-top: 2px dashed var(--or);
             font-size: 1.05rem;
             position: relative;
-            transform: rotate(-0.3deg);
+            transform: rotate(-0.3deg) translateZ(10px);
         }
 
         .details-sort::before {
@@ -463,7 +532,7 @@
             border: 1px solid var(--or);
             font-size: 0.8rem;
             box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
-            transform: rotate(3deg);
+            transform: rotate(3deg) translateZ(20px);
             font-family: 'Courier New', monospace;
             z-index: 10;
         }
@@ -512,7 +581,7 @@
             color: var(--encre);
             font-size: 0.9rem;
             position: relative;
-            transform: rotate(-0.5deg);
+            transform: rotate(-0.5deg) translateZ(20px);
         }
 
         .footer::before {
@@ -539,9 +608,9 @@
         }
 
         @keyframes pulsation {
-            0% { transform: scale(1) rotate(0.5deg); }
-            50% { transform: scale(1.01) rotate(0.5deg); }
-            100% { transform: scale(1) rotate(0.5deg); }
+            0% { transform: scale(1) rotateY(0deg) rotateX(0deg) rotateZ(0.5deg); }
+            50% { transform: scale(1.01) rotateY(-2deg) rotateX(1deg) rotateZ(0.5deg); }
+            100% { transform: scale(1) rotateY(0deg) rotateX(0deg) rotateZ(0.5deg); }
         }
 
         .pulsant {
@@ -565,11 +634,19 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            body {
+                perspective: none;
+            }
+            
             .grimoire {
                 padding: 20px;
                 margin: 15px;
                 border-width: 8px;
                 transform: none !important;
+            }
+            
+            .grimoire::before, .grimoire::after {
+                display: none;
             }
             
             .titre {
@@ -608,369 +685,373 @@
     <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="grimoire pulsant">
-        <!-- Marques de vieillissement -->
-        <div class="brulure brulure-1"></div>
-        <div class="brulure brulure-2"></div>
-        <div class="tache-encre tache-1"></div>
-        <div class="tache-encre tache-2"></div>
-        
-        <header class="header">
-            <div class="sigil">⚯⛧⚕</div>
-            <h1 class="titre">Codex Arcanum</h1>
-            <p class="sous-titre">Liber Secretorum Aeternum</p>
-        </header>
+    <div class="grimoire-container">
+        <div class="grimoire pulsant">
+            <!-- Marques de vieillissement -->
+            <div class="brulure brulure-1"></div>
+            <div class="brulure brulure-2"></div>
+            <div class="tache-encre tache-1"></div>
+            <div class="tache-encre tache-2"></div>
+            
+            <div class="grimoire-inner">
+                <header class="header">
+                    <div class="sigil">⚯⛧⚕</div>
+                    <h1 class="titre">Codex Arcanum</h1>
+                    <p class="sous-titre">Liber Secretorum Aeternum</p>
+                </header>
 
-        <div class="avertissement clignotant">
-            MISE EN GARDE OCCULTE<br>
-            <em>"Qui intrat hic, relinquat omnem spem"</em><br>
-            Ces formules scellées ne doivent être révélées qu'aux initiés du Cercle Intérieur
+                <div class="avertissement clignotant">
+                    MISE EN GARDE OCCULTE<br>
+                    <em>"Qui intrat hic, relinquat omnem spem"</em><br>
+                    Ces formules scellées ne doivent être révélées qu'aux initiés du Cercle Intérieur
+                </div>
+
+                <!-- Premier sortilège -->
+                <div class="sortilege">
+                    <h2 class="titre-sortilege">Lux Aeterna</h2>
+                    <p class="latin">"Lux in tenebris lucet, et tenebrae eam non comprehenderunt."</p>
+                    
+                    <div class="note">Consulter le folio XXVII pour les variantes lunaire</div>
+                    
+                    <div class="ingredients">
+                        <span class="ingredient">Bougie vierge de cire d'abeille</span>
+                        <span class="ingredient">Essence de camphre purifié</span>
+                        <span class="ingredient">Poudre de ver luisant (7 spécimens)</span>
+                        <span class="ingredient">Larme de phénix cristallisée</span>
+                        <span class="ingredient">Mercure philosophique (3 gouttes)</span>
+                    </div>
+                    
+                    <div class="formule">
+                        <strong>Formule d'incantation:</strong><br>
+                        "Per ignem aeternum et lumen indeficiens,<br>
+                        revela quod occultum est,<br>
+                        dissolve quod fictum est,<br>
+                        ostende veritatem sub luce tua perpetua!"
+                    </div>
+                    
+                    <div class="rituel">
+                        <h3>Rituel de Conjuration:</h3>
+                        <div class="etape">Préparer le cercle de conjuration avec les cinq pointes orientées vers les étoiles fixes</div>
+                        <div class="etape">Disposer les bougies aux points cardinaux (noire au nord, blanche à l'est, rouge au sud, bleue à l'ouest)</div>
+                        <div class="etape">Mélanger les ingrédients dans un mortier d'argent sous la lumière de la lune noire</div>
+                        <div class="etape">Réciter l'incantation en tournant dans le sens solaire (deosil) autour du cercle</div>
+                        <div class="etape">Allumer la bougie centrale avec une flamme volée (feu non allumé par main humaine)</div>
+                    </div>
+                    
+                    <div class="details-sort">
+                        <h3>Origine:</h3>
+                        <p>Manuscrit scellé de l'Abbaye de Saint-Grégoire le Thaumaturge, 1247. Transcrit d'après des fragments du <em>Liber de Lumine</em> attribué à Hermès Trismégiste.</p>
+                        
+                        <h3>Effets:</h3>
+                        <p>La lumière produite révèle:</p>
+                        <ul>
+                            <li>Les mensonges et illusions</li>
+                            <li>Les entités invisibles</li>
+                            <li>Les traces magiques récentes (jusqu'à 7 jours)</li>
+                            <li>Les objets enchantés</li>
+                        </ul>
+                        
+                        <h3>Avertissements:</h3>
+                        <p>L'usage prolongé peut provoquer:</p>
+                        <ul>
+                            <li>Confusion entre les réalités (Syndrome de Penthésilée)</li>
+                            <li>Perte de la vision normale (Cécité aeterna)</li>
+                            <li>Attraction d'entités photophages</li>
+                        </ul>
+                        
+                        <h3>Contremesures:</h3>
+                        <p>En cas de possession lumineuse, appliquer un onguent de terre sacrée sur les paupières et réciter le <em>Psaume 23</em> à l'envers.</p>
+                    </div>
+                </div>
+
+                <!-- Deuxième sortilège -->
+                <div class="sortilege">
+                    <h2 class="titre-sortilege">Sigillum Protectionis</h2>
+                    <p class="latin">"Per haec sancta nomina: Tetragrammaton, Adonai, Emmanuel, Sabaoth, protege nos ab omni malo et insidia."</p>
+                    
+                    <div class="note">Ne pas utiliser lors des éclipses</div>
+                    
+                    <div class="ingredients">
+                        <span class="ingredient">Sable des sept tombeaux</span>
+                        <span class="ingredient">Sel exorcisé (bénit par 3 religions)</span>
+                        <span class="ingredient">Encens de myrrhe noire</span>
+                        <span class="ingredient">Sang du praticien (3 gouttes)</span>
+                        <span class="ingredient">Plume de corbeau albinos</span>
+                    </div>
+                    
+                    <div class="formule">
+                        <strong>Formule d'activation:</strong><br>
+                        "Per virtutem Dei vivi,<br>
+                        per potentiam Dei veri,<br>
+                        per amorem Dei sancti,<br>
+                        hoc sigillum sit murus fortis<br>
+                        contra omnes malignos spiritus!"
+                    </div>
+                    
+                    <div class="rituel">
+                        <h3>Rituel de Protection:</h3>
+                        <div class="etape">Tracer le cercle avec le poignard rituel (main gauche pour les initiés, droite pour les novices)</div>
+                        <div class="etape">Inscrire les noms sacrés aux quatre points cardinaux</div>
+                        <div class="etape">Saupoudrer le mélange sel/sable en récitant les noms des archanges</div>
+                        <div class="etape">Allumer l'encens aux trois points de la Trinité</div>
+                        <div class="etape">Sceller avec le sang en formant le pentagramme de protection</div>
+                    </div>
+                    
+                    <div class="details-sort">
+                        <h3>Origine:</h3>
+                        <p>Parchemins scellés découverts dans la Chambre Secrète des Catacombes d'Alexandrie, traduits par Albert le Grand en 1262. Basé sur des formules attribuées au roi Salomon.</p>
+                        
+                        <h3>Effets:</h3>
+                        <ul>
+                            <li>Barrière contre les entités malveillantes (niveau 7 selon l'échelle de Binsfeld)</li>
+                            <li>Protection contre les malédictions et envoûtements</li>
+                            <li>Détection des intentions hostiles</li>
+                            <li>Purification de l'espace sacré</li>
+                        </ul>
+                        
+                        <h3>Avertissements:</h3>
+                        <ul>
+                            <li>Le cercle se rompt si le praticien en sort volontairement</li>
+                            <li>Ne pas utiliser plus de 7 nuits consécutives</li>
+                            <li>Contre-indiqué pour les femmes enceintes</li>
+                        </ul>
+                        
+                        <h3>Variantes:</h3>
+                        <p>Pour une protection permanente, mélanger les ingrédients avec du mortier et inscrire sur le linteau de la porte avec la plume.</p>
+                    </div>
+                </div>
+
+                <!-- Troisième sortilège -->
+                <div class="sortilege">
+                    <h2 class="titre-sortilege">Verbum Mortis</h2>
+                    <p class="latin">"Mors vincit omnia, et nos cedamus morti."</p>
+                    
+                    <div class="note">Interdit par le Concile de Lyon, 1274</div>
+                    
+                    <div class="ingredients">
+                        <span class="ingredient">Poussière de crâne (nécromant certifié)</span>
+                        <span class="ingredient">Cire de cierge funéraire (brûlé pendant les obsèques)</span>
+                        <span class="ingredient">Souche d'if millénaire</span>
+                        <span class="ingredient">Souffle du dernier mot (capturé dans un miroir noir)</span>
+                        <span class="ingredient">Sang lunaire (recueilli pendant une éclipse)</span>
+                    </div>
+                    
+                    <div class="formule">
+                        <strong>Formule d'évocation:</strong><br>
+                        "Per portas mortis et umbram aeternam,<br>
+                        voco te, (nom du défunt),<br>
+                        per sanguinem meum et ossa tua,<br>
+                        responde mihi veritatem post mortem!"
+                    </div>
+                    
+                    <div class="rituel">
+                        <h3>Rituel Nécromantique:</h3>
+                        <div class="etape">Modeler une effigie avec la cire et la poussière de crâne</div>
+                        <div class="etape">Graver le nom du défunt avec la souche d'if</div>
+                        <div class="etape">Disposer trois miroirs en triangle autour de l'effigie</div>
+                        <div class="etape">Réciter l'incantation à minuit en tenant le miroir noir</div>
+                        <div class="etape">Sceller le pacte avec une goutte de sang sur les lèvres de l'effigie</div>
+                    </div>
+                    
+                    <div class="details-sort">
+                        <h3>Origine:</h3>
+                        <p>Fragment du <em>Livre d'Eibon</em>, copié par Théodoric de Vérone en 1289 à partir d'un original perdu. Mentionné dans les procès-verbaux de l'Inquisition comme "Sortilège de Classe VII - Interdit".</p>
+                        
+                        <h3>Effets:</h3>
+                        <ul>
+                            <li>Communication avec les trépassés (durée limitée à 13 minutes)</li>
+                            <li>Accès à la connaissance des ancêtres</li>
+                            <li>Vision des événements passés</li>
+                            <li>Possibilité de poser 3 questions (selon la Loi de Triplicité)</li>
+                        </ul>
+                        
+                        <h3>Avertissements:</h3>
+                        <ul>
+                            <li>19 des 23 praticiens documentés sont morts dans l'année</li>
+                            <li>Les 4 survivants ont développé une héméralopie permanente</li>
+                            <li>Risque de possession par l'esprit évoqué</li>
+                            <li>Interdit par les Conventions Arcaniques de 1283</li>
+                        </ul>
+                        
+                        <h3>Contremesures:</h3>
+                        <p>En cas de possession, brûler l'effigie avec du sel gemme tout en récitant le <em>Libera Me</em>. Consulter immédiatement un exorciste agréé.</p>
+                    </div>
+                </div>
+
+                <!-- Quatrième sortilège -->
+                <div class="sortilege">
+                    <h2 class="titre-sortilege">Amor Aeternus</h2>
+                    <p class="latin">"Per amorem vincit omnia, et nos cedamus amori."</p>
+                    
+                    <div class="note">Double effet si réalisé à la Saint-Valentin</div>
+                    
+                    <div class="ingredients">
+                        <span class="ingredient">Rose rouge cueillie à minuit</span>
+                        <span class="ingredient">Miel de lune (première récolte)</span>
+                        <span class="ingredient">Sang menstruel (optionnel)</span>
+                        <span class="ingredient">Cheveu de la cible</span>
+                        <span class="ingredient">Poudre de perle vierge</span>
+                    </div>
+                    
+                    <div class="formule">
+                        <strong>Formule d'envoûtement:</strong><br>
+                        "Per cor meum et cor tuum,<br>
+                        per sanguinem et spiritum,<br>
+                        sit nostra connexio<br>
+                        firmior morte, dulcior vita!"
+                    </div>
+                    
+                    <div class="rituel">
+                        <h3>Rituel d'Envoûtement:</h3>
+                        <div class="etape">Tresser le cheveu avec un fil rouge et la rose</div>
+                        <div class="etape">Enduire de miel et saupoudrer de perle</div>
+                        <div class="etape">Enterrer sous un rosier en pleine lune</div>
+                        <div class="etape">Réciter l'incantation en tenant l'amulette contre son cœur</div>
+                        <div class="etape">Offrir un cadeau à la cible dans les 3 jours</div>
+                    </div>
+                    
+                    <div class="details-sort">
+                        <h3>Origine:</h3>
+                        <p>Transmis par les sorcières de Thessalie, adapté par Marie la Juive dans son <em>Grimoire des Passions</em> (XIIIe siècle).</p>
+                        
+                        <h3>Effets:</h3>
+                        <ul>
+                            <li>Attirance immédiate (24-72 heures)</li>
+                            <li>Lien émotionnel durable (3-7 ans)</li>
+                            <li>Protection contre les rivales</li>
+                            <li>Rêves partagés (après 7 nuits)</li>
+                        </ul>
+                        
+                        <h3>Avertissements:</h3>
+                        <ul>
+                            <li>Effet inverse si la cible est protégée</li>
+                            <li>Peut provoquer une obsession maladive</li>
+                            <li>Interdit par le Canon Ecclésiastique</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Cinquième sortilège (nouveau) -->
+                <div class="sortilege">
+                    <h2 class="titre-sortilege">Visio Futuri</h2>
+                    <p class="latin">"Tempus omnia revelat, sed non omnibus."</p>
+                    
+                    <div class="note">Ne pas utiliser plus d'une fois par cycle lunaire</div>
+                    
+                    <div class="ingredients">
+                        <span class="ingredient">Cristal de roche naturellement creux</span>
+                        <span class="ingredient">Eau de pluie recueillie dans un crâne</span>
+                        <span class="ingredient">Feuilles de sauge divinatoire</span>
+                        <span class="ingredient">Poudre d'œil de lapis-lazuli</span>
+                        <span class="ingredient">Encens d'acacia</span>
+                    </div>
+                    
+                    <div class="formule">
+                        <strong>Formule de divination:</strong><br>
+                        "Per speculum aeternitatis,<br>
+                        per oculos interioris,<br>
+                        revela quod venturum est,<br>
+                        sed serva mentem meam ab insania!"
+                    </div>
+                    
+                    <div class="rituel">
+                        <h3>Rituel de Vision:</h3>
+                        <div class="etape">Placer le cristal dans un récipient en argent rempli d'eau de pluie</div>
+                        <div class="etape">Brûler les feuilles de sauge avec l'encens dans un brûle-parfum en cuivre</div>
+                        <div class="etape">Ajouter la poudre de lapis-lazuli à l'eau tout en récitant les noms des sept planètes</div>
+                        <div class="etape">Fixer le cristal à la lumière d'une bougie noire pendant que la fumée monte</div>
+                        <div class="etape">Réciter l'incantation lorsque la surface de l'eau commence à miroiter</div>
+                    </div>
+                    
+                    <div class="details-sort">
+                        <h3>Origine:</h3>
+                        <p>Dérivé des pratiques des Oracles de Delphes, adapté par Michel Scot dans son <em>Liber Divinationis</em> (1228). Mentionné dans les archives secrètes du Vatican.</p>
+                        
+                        <h3>Effets:</h3>
+                        <ul>
+                            <li>Visions des événements futurs (3-7 jours)</li>
+                            <li>Prémonitions des dangers imminents</li>
+                            <li>Réponses symboliques aux questions posées</li>
+                            <li>Accès à des connaissances cachées</li>
+                        </ul>
+                        
+                        <h3>Avertissements:</h3>
+                        <ul>
+                            <li>Les visions peuvent être cryptiques ou trompeuses</li>
+                            <li>Risque de confusion temporelle</li>
+                            <li>Peut attirer l'attention des Gardiens du Temps</li>
+                            <li>Déconseillé aux personnes épileptiques</li>
+                        </ul>
+                        
+                        <h3>Interprétation:</h3>
+                        <p>Les symboles apparaissant dans le cristal doivent être comparés avec les tables de correspondance du <em>Liber Sigillorum</em>. Les visions en rouge indiquent des dangers, celles en or des opportunités.</p>
+                    </div>
+                </div>
+
+                <!-- Sixième sortilège (nouveau) -->
+                <div class="sortilege">
+                    <h2 class="titre-sortilege">Potestas Bestiae</h2>
+                    <p class="latin">"Natura non facit saltus, sed spiritus potest."</p>
+                    
+                    <div class="note">Réservé aux initiés du 3ème cercle</div>
+                    
+                    <div class="ingredients">
+                        <span class="ingredient">Griffe de loup-garou (pleine lune)</span>
+                        <span class="ingredient">Peau de serpent à sonnettes</span>
+                        <span class="ingredient">Cœur de taureau sacrifié</span>
+                        <span class="ingredient">Aile de chauve-souris vampire</span>
+                        <span class="ingredient">Sang du praticien (13 gouttes)</span>
+                    </div>
+                    
+                    <div class="formule">
+                        <strong>Formule de transformation:</strong><br>
+                        "Per vim naturae et potentiam bestiae,<br>
+                        solve hanc formam humanam,<br>
+                        da mihi virtutem feram,<br>
+                        sed redde mentem meam integram!"
+                    </div>
+                    
+                    <div class="rituel">
+                        <h3>Rituel de Métamorphose:</h3>
+                        <div class="etape">Tracer un cercle avec la griffe de loup-garou</div>
+                        <div class="etape">Revêtir la peau de serpent comme ceinture</div>
+                        <div class="etape">Consommer le cœur cru en récitant les noms des bêtes totems</div>
+                        <div class="etape">Fixer l'aile de chauve-souris sur la poitrine avec le sang</div>
+                        <div class="etape">Réciter l'incantation sous la lumière des étoiles de la Grande Ourse</div>
+                    </div>
+                    
+                    <div class="details-sort">
+                        <h3>Origine:</h3>
+                        <p>Rituel chamanique nordique adapté par les Berserkers, codifié par l'Ordre des Lycanthropes en 1156. Interdit par le Concile de Trente.</p>
+                        
+                        <h3>Effets:</h3>
+                        <ul>
+                            <li>Force surhumaine (durée: 1-3 heures)</li>
+                            <li>Accuité sensorielle animale</li>
+                            <li>Résistance à la douleur</li>
+                            <li>Capacités spécifiques selon les ingrédients utilisés</li>
+                        </ul>
+                        
+                        <h3>Avertissements:</h3>
+                        <ul>
+                            <li>Risque de transformation partielle permanente</li>
+                            <li>Perte progressive d'humanité avec usage répété</li>
+                            <li>Attraction des chasseurs de monstres</li>
+                            <li>Interdit par les Lois Arcaniques</li>
+                        </ul>
+                        
+                        <h3>Contremesures:</h3>
+                        <p>En cas de transformation incontrôlée, boire une décoction d'aconit et d'armoise sous la supervision d'un chaman expérimenté.</p>
+                    </div>
+                </div>
+
+                <footer class="footer">
+                    &copy; Anno MCMXXIV - Ce Codex est la propriété de l'Ordre des Veilleurs Noirs.<br>
+                    <em>"Qui revelat arcana perdet oculos suos"</em><br>
+                    La reproduction non autorisée est punie par les lois divines et humaines.
+                </footer>
+            </div>
         </div>
-
-        <!-- Premier sortilège -->
-        <div class="sortilege">
-            <h2 class="titre-sortilege">Lux Aeterna</h2>
-            <p class="latin">"Lux in tenebris lucet, et tenebrae eam non comprehenderunt."</p>
-            
-            <div class="note">Consulter le folio XXVII pour les variantes lunaire</div>
-            
-            <div class="ingredients">
-                <span class="ingredient">Bougie vierge de cire d'abeille</span>
-                <span class="ingredient">Essence de camphre purifié</span>
-                <span class="ingredient">Poudre de ver luisant (7 spécimens)</span>
-                <span class="ingredient">Larme de phénix cristallisée</span>
-                <span class="ingredient">Mercure philosophique (3 gouttes)</span>
-            </div>
-            
-            <div class="formule">
-                <strong>Formule d'incantation:</strong><br>
-                "Per ignem aeternum et lumen indeficiens,<br>
-                revela quod occultum est,<br>
-                dissolve quod fictum est,<br>
-                ostende veritatem sub luce tua perpetua!"
-            </div>
-            
-            <div class="rituel">
-                <h3>Rituel de Conjuration:</h3>
-                <div class="etape">Préparer le cercle de conjuration avec les cinq pointes orientées vers les étoiles fixes</div>
-                <div class="etape">Disposer les bougies aux points cardinaux (noire au nord, blanche à l'est, rouge au sud, bleue à l'ouest)</div>
-                <div class="etape">Mélanger les ingrédients dans un mortier d'argent sous la lumière de la lune noire</div>
-                <div class="etape">Réciter l'incantation en tournant dans le sens solaire (deosil) autour du cercle</div>
-                <div class="etape">Allumer la bougie centrale avec une flamme volée (feu non allumé par main humaine)</div>
-            </div>
-            
-            <div class="details-sort">
-                <h3>Origine:</h3>
-                <p>Manuscrit scellé de l'Abbaye de Saint-Grégoire le Thaumaturge, 1247. Transcrit d'après des fragments du <em>Liber de Lumine</em> attribué à Hermès Trismégiste.</p>
-                
-                <h3>Effets:</h3>
-                <p>La lumière produite révèle:</p>
-                <ul>
-                    <li>Les mensonges et illusions</li>
-                    <li>Les entités invisibles</li>
-                    <li>Les traces magiques récentes (jusqu'à 7 jours)</li>
-                    <li>Les objets enchantés</li>
-                </ul>
-                
-                <h3>Avertissements:</h3>
-                <p>L'usage prolongé peut provoquer:</p>
-                <ul>
-                    <li>Confusion entre les réalités (Syndrome de Penthésilée)</li>
-                    <li>Perte de la vision normale (Cécité aeterna)</li>
-                    <li>Attraction d'entités photophages</li>
-                </ul>
-                
-                <h3>Contremesures:</h3>
-                <p>En cas de possession lumineuse, appliquer un onguent de terre sacrée sur les paupières et réciter le <em>Psaume 23</em> à l'envers.</p>
-            </div>
-        </div>
-
-        <!-- Deuxième sortilège -->
-        <div class="sortilege">
-            <h2 class="titre-sortilege">Sigillum Protectionis</h2>
-            <p class="latin">"Per haec sancta nomina: Tetragrammaton, Adonai, Emmanuel, Sabaoth, protege nos ab omni malo et insidia."</p>
-            
-            <div class="note">Ne pas utiliser lors des éclipses</div>
-            
-            <div class="ingredients">
-                <span class="ingredient">Sable des sept tombeaux</span>
-                <span class="ingredient">Sel exorcisé (bénit par 3 religions)</span>
-                <span class="ingredient">Encens de myrrhe noire</span>
-                <span class="ingredient">Sang du praticien (3 gouttes)</span>
-                <span class="ingredient">Plume de corbeau albinos</span>
-            </div>
-            
-            <div class="formule">
-                <strong>Formule d'activation:</strong><br>
-                "Per virtutem Dei vivi,<br>
-                per potentiam Dei veri,<br>
-                per amorem Dei sancti,<br>
-                hoc sigillum sit murus fortis<br>
-                contra omnes malignos spiritus!"
-            </div>
-            
-            <div class="rituel">
-                <h3>Rituel de Protection:</h3>
-                <div class="etape">Tracer le cercle avec le poignard rituel (main gauche pour les initiés, droite pour les novices)</div>
-                <div class="etape">Inscrire les noms sacrés aux quatre points cardinaux</div>
-                <div class="etape">Saupoudrer le mélange sel/sable en récitant les noms des archanges</div>
-                <div class="etape">Allumer l'encens aux trois points de la Trinité</div>
-                <div class="etape">Sceller avec le sang en formant le pentagramme de protection</div>
-            </div>
-            
-            <div class="details-sort">
-                <h3>Origine:</h3>
-                <p>Parchemins scellés découverts dans la Chambre Secrète des Catacombes d'Alexandrie, traduits par Albert le Grand en 1262. Basé sur des formules attribuées au roi Salomon.</p>
-                
-                <h3>Effets:</h3>
-                <ul>
-                    <li>Barrière contre les entités malveillantes (niveau 7 selon l'échelle de Binsfeld)</li>
-                    <li>Protection contre les malédictions et envoûtements</li>
-                    <li>Détection des intentions hostiles</li>
-                    <li>Purification de l'espace sacré</li>
-                </ul>
-                
-                <h3>Avertissements:</h3>
-                <ul>
-                    <li>Le cercle se rompt si le praticien en sort volontairement</li>
-                    <li>Ne pas utiliser plus de 7 nuits consécutives</li>
-                    <li>Contre-indiqué pour les femmes enceintes</li>
-                </ul>
-                
-                <h3>Variantes:</h3>
-                <p>Pour une protection permanente, mélanger les ingrédients avec du mortier et inscrire sur le linteau de la porte avec la plume.</p>
-            </div>
-        </div>
-
-        <!-- Troisième sortilège -->
-        <div class="sortilege">
-            <h2 class="titre-sortilege">Verbum Mortis</h2>
-            <p class="latin">"Mors vincit omnia, et nos cedamus morti."</p>
-            
-            <div class="note">Interdit par le Concile de Lyon, 1274</div>
-            
-            <div class="ingredients">
-                <span class="ingredient">Poussière de crâne (nécromant certifié)</span>
-                <span class="ingredient">Cire de cierge funéraire (brûlé pendant les obsèques)</span>
-                <span class="ingredient">Souche d'if millénaire</span>
-                <span class="ingredient">Souffle du dernier mot (capturé dans un miroir noir)</span>
-                <span class="ingredient">Sang lunaire (recueilli pendant une éclipse)</span>
-            </div>
-            
-            <div class="formule">
-                <strong>Formule d'évocation:</strong><br>
-                "Per portas mortis et umbram aeternam,<br>
-                voco te, (nom du défunt),<br>
-                per sanguinem meum et ossa tua,<br>
-                responde mihi veritatem post mortem!"
-            </div>
-            
-            <div class="rituel">
-                <h3>Rituel Nécromantique:</h3>
-                <div class="etape">Modeler une effigie avec la cire et la poussière de crâne</div>
-                <div class="etape">Graver le nom du défunt avec la souche d'if</div>
-                <div class="etape">Disposer trois miroirs en triangle autour de l'effigie</div>
-                <div class="etape">Réciter l'incantation à minuit en tenant le miroir noir</div>
-                <div class="etape">Sceller le pacte avec une goutte de sang sur les lèvres de l'effigie</div>
-            </div>
-            
-            <div class="details-sort">
-                <h3>Origine:</h3>
-                <p>Fragment du <em>Livre d'Eibon</em>, copié par Théodoric de Vérone en 1289 à partir d'un original perdu. Mentionné dans les procès-verbaux de l'Inquisition comme "Sortilège de Classe VII - Interdit".</p>
-                
-                <h3>Effets:</h3>
-                <ul>
-                    <li>Communication avec les trépassés (durée limitée à 13 minutes)</li>
-                    <li>Accès à la connaissance des ancêtres</li>
-                    <li>Vision des événements passés</li>
-                    <li>Possibilité de poser 3 questions (selon la Loi de Triplicité)</li>
-                </ul>
-                
-                <h3>Avertissements:</h3>
-                <ul>
-                    <li>19 des 23 praticiens documentés sont morts dans l'année</li>
-                    <li>Les 4 survivants ont développé une héméralopie permanente</li>
-                    <li>Risque de possession par l'esprit évoqué</li>
-                    <li>Interdit par les Conventions Arcaniques de 1283</li>
-                </ul>
-                
-                <h3>Contremesures:</h3>
-                <p>En cas de possession, brûler l'effigie avec du sel gemme tout en récitant le <em>Libera Me</em>. Consulter immédiatement un exorciste agréé.</p>
-            </div>
-        </div>
-
-        <!-- Quatrième sortilège -->
-        <div class="sortilege">
-            <h2 class="titre-sortilege">Amor Aeternus</h2>
-            <p class="latin">"Per amorem vincit omnia, et nos cedamus amori."</p>
-            
-            <div class="note">Double effet si réalisé à la Saint-Valentin</div>
-            
-            <div class="ingredients">
-                <span class="ingredient">Rose rouge cueillie à minuit</span>
-                <span class="ingredient">Miel de lune (première récolte)</span>
-                <span class="ingredient">Sang menstruel (optionnel)</span>
-                <span class="ingredient">Cheveu de la cible</span>
-                <span class="ingredient">Poudre de perle vierge</span>
-            </div>
-            
-            <div class="formule">
-                <strong>Formule d'envoûtement:</strong><br>
-                "Per cor meum et cor tuum,<br>
-                per sanguinem et spiritum,<br>
-                sit nostra connexio<br>
-                firmior morte, dulcior vita!"
-            </div>
-            
-            <div class="rituel">
-                <h3>Rituel d'Envoûtement:</h3>
-                <div class="etape">Tresser le cheveu avec un fil rouge et la rose</div>
-                <div class="etape">Enduire de miel et saupoudrer de perle</div>
-                <div class="etape">Enterrer sous un rosier en pleine lune</div>
-                <div class="etape">Réciter l'incantation en tenant l'amulette contre son cœur</div>
-                <div class="etape">Offrir un cadeau à la cible dans les 3 jours</div>
-            </div>
-            
-            <div class="details-sort">
-                <h3>Origine:</h3>
-                <p>Transmis par les sorcières de Thessalie, adapté par Marie la Juive dans son <em>Grimoire des Passions</em> (XIIIe siècle).</p>
-                
-                <h3>Effets:</h3>
-                <ul>
-                    <li>Attirance immédiate (24-72 heures)</li>
-                    <li>Lien émotionnel durable (3-7 ans)</li>
-                    <li>Protection contre les rivales</li>
-                    <li>Rêves partagés (après 7 nuits)</li>
-                </ul>
-                
-                <h3>Avertissements:</h3>
-                <ul>
-                    <li>Effet inverse si la cible est protégée</li>
-                    <li>Peut provoquer une obsession maladive</li>
-                    <li>Interdit par le Canon Ecclésiastique</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Cinquième sortilège (nouveau) -->
-        <div class="sortilege">
-            <h2 class="titre-sortilege">Visio Futuri</h2>
-            <p class="latin">"Tempus omnia revelat, sed non omnibus."</p>
-            
-            <div class="note">Ne pas utiliser plus d'une fois par cycle lunaire</div>
-            
-            <div class="ingredients">
-                <span class="ingredient">Cristal de roche naturellement creux</span>
-                <span class="ingredient">Eau de pluie recueillie dans un crâne</span>
-                <span class="ingredient">Feuilles de sauge divinatoire</span>
-                <span class="ingredient">Poudre d'œil de lapis-lazuli</span>
-                <span class="ingredient">Encens d'acacia</span>
-            </div>
-            
-            <div class="formule">
-                <strong>Formule de divination:</strong><br>
-                "Per speculum aeternitatis,<br>
-                per oculos interioris,<br>
-                revela quod venturum est,<br>
-                sed serva mentem meam ab insania!"
-            </div>
-            
-            <div class="rituel">
-                <h3>Rituel de Vision:</h3>
-                <div class="etape">Placer le cristal dans un récipient en argent rempli d'eau de pluie</div>
-                <div class="etape">Brûler les feuilles de sauge avec l'encens dans un brûle-parfum en cuivre</div>
-                <div class="etape">Ajouter la poudre de lapis-lazuli à l'eau tout en récitant les noms des sept planètes</div>
-                <div class="etape">Fixer le cristal à la lumière d'une bougie noire pendant que la fumée monte</div>
-                <div class="etape">Réciter l'incantation lorsque la surface de l'eau commence à miroiter</div>
-            </div>
-            
-            <div class="details-sort">
-                <h3>Origine:</h3>
-                <p>Dérivé des pratiques des Oracles de Delphes, adapté par Michel Scot dans son <em>Liber Divinationis</em> (1228). Mentionné dans les archives secrètes du Vatican.</p>
-                
-                <h3>Effets:</h3>
-                <ul>
-                    <li>Visions des événements futurs (3-7 jours)</li>
-                    <li>Prémonitions des dangers imminents</li>
-                    <li>Réponses symboliques aux questions posées</li>
-                    <li>Accès à des connaissances cachées</li>
-                </ul>
-                
-                <h3>Avertissements:</h3>
-                <ul>
-                    <li>Les visions peuvent être cryptiques ou trompeuses</li>
-                    <li>Risque de confusion temporelle</li>
-                    <li>Peut attirer l'attention des Gardiens du Temps</li>
-                    <li>Déconseillé aux personnes épileptiques</li>
-                </ul>
-                
-                <h3>Interprétation:</h3>
-                <p>Les symboles apparaissant dans le cristal doivent être comparés avec les tables de correspondance du <em>Liber Sigillorum</em>. Les visions en rouge indiquent des dangers, celles en or des opportunités.</p>
-            </div>
-        </div>
-
-        <!-- Sixième sortilège (nouveau) -->
-        <div class="sortilege">
-            <h2 class="titre-sortilege">Potestas Bestiae</h2>
-            <p class="latin">"Natura non facit saltus, sed spiritus potest."</p>
-            
-            <div class="note">Réservé aux initiés du 3ème cercle</div>
-            
-            <div class="ingredients">
-                <span class="ingredient">Griffe de loup-garou (pleine lune)</span>
-                <span class="ingredient">Peau de serpent à sonnettes</span>
-                <span class="ingredient">Cœur de taureau sacrifié</span>
-                <span class="ingredient">Aile de chauve-souris vampire</span>
-                <span class="ingredient">Sang du praticien (13 gouttes)</span>
-            </div>
-            
-            <div class="formule">
-                <strong>Formule de transformation:</strong><br>
-                "Per vim naturae et potentiam bestiae,<br>
-                solve hanc formam humanam,<br>
-                da mihi virtutem feram,<br>
-                sed redde mentem meam integram!"
-            </div>
-            
-            <div class="rituel">
-                <h3>Rituel de Métamorphose:</h3>
-                <div class="etape">Tracer un cercle avec la griffe de loup-garou</div>
-                <div class="etape">Revêtir la peau de serpent comme ceinture</div>
-                <div class="etape">Consommer le cœur cru en récitant les noms des bêtes totems</div>
-                <div class="etape">Fixer l'aile de chauve-souris sur la poitrine avec le sang</div>
-                <div class="etape">Réciter l'incantation sous la lumière des étoiles de la Grande Ourse</div>
-            </div>
-            
-            <div class="details-sort">
-                <h3>Origine:</h3>
-                <p>Rituel chamanique nordique adapté par les Berserkers, codifié par l'Ordre des Lycanthropes en 1156. Interdit par le Concile de Trente.</p>
-                
-                <h3>Effets:</h3>
-                <ul>
-                    <li>Force surhumaine (durée: 1-3 heures)</li>
-                    <li>Accuité sensorielle animale</li>
-                    <li>Résistance à la douleur</li>
-                    <li>Capacités spécifiques selon les ingrédients utilisés</li>
-                </ul>
-                
-                <h3>Avertissements:</h3>
-                <ul>
-                    <li>Risque de transformation partielle permanente</li>
-                    <li>Perte progressive d'humanité avec usage répété</li>
-                    <li>Attraction des chasseurs de monstres</li>
-                    <li>Interdit par les Lois Arcaniques</li>
-                </ul>
-                
-                <h3>Contremesures:</h3>
-                <p>En cas de transformation incontrôlée, boire une décoction d'aconit et d'armoise sous la supervision d'un chaman expérimenté.</p>
-            </div>
-        </div>
-
-        <footer class="footer">
-            &copy; Anno MCMXXIV - Ce Codex est la propriété de l'Ordre des Veilleurs Noirs. Diriges par le mage Inoxel<br>
-            <em>"Qui revelat arcana perdet oculos suos"</em><br>
-            La reproduction non autorisée est punie par les lois divines et humaines, prennez garde mortel ou sinon vous le regretterais.
-        </footer>
     </div>
 </body>
 </html>

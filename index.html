@@ -1,106 +1,284 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Détecteur d'ondes sonores et mouvements</title>
+  <meta charset="UTF-8">
+  <title>Détecteur EMF - Supernatural</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #121212; color: #eee; text-align: center; }
-    canvas { background: #222; margin: 20px auto; display: block; }
-    #motionData { font-size: 1.2em; margin-top: 10px; }
-    button { padding: 10px 20px; font-size: 1em; margin-top: 15px; cursor: pointer; }
+    body {
+      font-family: 'Courier New', monospace;
+      background: #000;
+      color: #0f0;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      overflow: hidden;
+    }
+    #container {
+      max-width: 500px;
+      margin: 0 auto;
+      border: 2px solid #0f0;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #0f0;
+      position: relative;
+      background: rgba(0, 20, 0, 0.3);
+    }
+    h1, h2 {
+      color: #0f0;
+      text-shadow: 0 0 10px #0f0;
+      margin: 5px 0;
+    }
+    #emfLevel {
+      font-size: 1.5em;
+      margin: 20px 0;
+      color: #0f0;
+    }
+    #level {
+      font-size: 1.8em;
+      color: #0f0;
+    }
+    canvas {
+      background: #000;
+      margin: 20px auto;
+      display: block;
+      border: 1px solid #0f0;
+    }
+    #status {
+      margin: 15px 0;
+      font-size: 1.1em;
+    }
+    .controls {
+      margin: 15px 0;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin: 5px;
+      cursor: pointer;
+      background: #000;
+      color: #0f0;
+      border: 1px solid #0f0;
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: #0f0;
+      color: #000;
+      box-shadow: 0 0 15px #0f0;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    #instructions {
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #0a0;
+    }
+    .scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: rgba(0, 255, 0, 0.5);
+      box-shadow: 0 0 10px #0f0;
+      animation: scan 4s linear infinite;
+      opacity: 0;
+    }
+    @keyframes scan {
+      0% { top: 0; opacity: 0; }
+      5% { opacity: 1; }
+      95% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .pulse {
+      animation: pulse 0.5s infinite alternate;
+    }
+    @keyframes pulse {
+      from { opacity: 0.5; }
+      to { opacity: 1; }
+    }
   </style>
 </head>
 <body>
-  <h1>Détecteur d'ondes sonores et mouvements</h1>
-  <button id="startBtn">Démarrer la détection</button>
-  
-  <canvas id="audioCanvas" width="320" height="100"></canvas>
-
-  <div id="motionData">
-    <p>Accéléromètre :</p>
-    <p>X : <span id="accX">0</span></p>
-    <p>Y : <span id="accY">0</span></p>
-    <p>Z : <span id="accZ">0</span></p>
+  <div id="container">
+    <div class="scan-line"></div>
+    <h1>DÉTECTEUR EMF</h1>
+    <h2>MODÈLE SUPERNATURAL</h2>
+    
+    <div id="emfLevel">NIVEAU EMF: <span id="level">0</span></div>
+    
+    <canvas id="emfCanvas" width="400" height="200"></canvas>
+    
+    <div id="status">Système inactif</div>
+    
+    <div class="controls">
+      <button id="startBtn">ACTIVER</button>
+      <button id="simulateBtn">SIMULER UNE ACTIVITÉ</button>
+      <button id="resetBtn">RÉINITIALISER</button>
+    </div>
+    
+    <div id="instructions">
+      <p>Niveau 1: Présence spirituelle faible</p>
+      <p>Niveau 2: Entité mineure</p>
+      <p>Niveau 3: Fantôme/Esprit</p>
+      <p>Niveau 4: Démon/Entité puissante</p>
+      <p>Niveau 5: Présence extrêmement malveillante</p>
+    </div>
   </div>
+
+  <audio id="alertSound" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
+  <audio id="staticSound" src="https://assets.mixkit.co/sfx/preview/mixkit-radio-static-1680.mp3" preload="auto" loop></audio>
 
   <script>
     const startBtn = document.getElementById('startBtn');
-    const audioCanvas = document.getElementById('audioCanvas');
-    const ctx = audioCanvas.getContext('2d');
+    const simulateBtn = document.getElementById('simulateBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const emfCanvas = document.getElementById('emfCanvas');
+    const ctx = emfCanvas.getContext('2d');
+    const emfLevel = document.getElementById('level');
+    const statusDiv = document.getElementById('status');
+    const alertSound = document.getElementById('alertSound');
+    const staticSound = document.getElementById('staticSound');
 
-    const accXSpan = document.getElementById('accX');
-    const accYSpan = document.getElementById('accY');
-    const accZSpan = document.getElementById('accZ');
+    let isActive = false;
+    let emfValue = 0;
+    let maxEmf = 0;
+    let animationFrame;
+    let spikes = [];
 
-    let audioCtx, analyser, dataArray, source;
-
-    function drawAudio() {
-      requestAnimationFrame(drawAudio);
-      analyser.getByteFrequencyData(dataArray);
-
-      ctx.fillStyle = '#121212';
-      ctx.fillRect(0, 0, audioCanvas.width, audioCanvas.height);
-
-      const barWidth = (audioCanvas.width / dataArray.length) * 2.5;
-      let x = 0;
-
-      for (let i = 0; i < dataArray.length; i++) {
-        const barHeight = dataArray[i];
-        const red = barHeight + 50;
-        const green = 50;
-        const blue = 50;
-
-        ctx.fillStyle = `rgb(${red},${green},${blue})`;
-        ctx.fillRect(x, audioCanvas.height - barHeight / 2, barWidth, barHeight / 2);
-
-        x += barWidth + 1;
+    function drawGrid() {
+      ctx.strokeStyle = 'rgba(0, 255, 0, 0.2)';
+      ctx.lineWidth = 0.5;
+      for (let x = 0; x <= emfCanvas.width; x += 20) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, emfCanvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= emfCanvas.height; y += 20) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(emfCanvas.width, y);
+        ctx.stroke();
       }
     }
 
-    function handleMotion(event) {
-      const acc = event.accelerationIncludingGravity;
-      accXSpan.textContent = acc.x ? acc.x.toFixed(2) : '0';
-      accYSpan.textContent = acc.y ? acc.y.toFixed(2) : '0';
-      accZSpan.textContent = acc.z ? acc.z.toFixed(2) : '0';
+    function drawEMF() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.fillRect(0, 0, emfCanvas.width, emfCanvas.height);
+      drawGrid();
+
+      ctx.strokeStyle = '#0f0';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, emfCanvas.height - (emfValue / 5 * emfCanvas.height));
+
+      for (let i = 1; i < emfCanvas.width; i++) {
+        const x = i;
+        const y = emfCanvas.height - (getEMFValueAtPosition(i) / 5 * emfCanvas.height);
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      if (Math.random() < 0.02 && isActive) addSpike();
+
+      spikes.forEach((spike, index) => {
+        const age = Date.now() - spike.time;
+        if (age > 2000) spikes.splice(index, 1);
+        else {
+          const alpha = 1 - (age / 2000);
+          const height = spike.value / 5 * emfCanvas.height * alpha;
+          ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`;
+          ctx.fillRect(spike.x - 2, emfCanvas.height - height, 4, height);
+        }
+      });
+
+      animationFrame = requestAnimationFrame(drawEMF);
     }
 
-    async function startDetection() {
-      startBtn.disabled = true;
-      // Audio setup
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function getEMFValueAtPosition(x) {
+      const timeFactor = Date.now() / 1000;
+      const noise = Math.sin(x * 0.1 + timeFactor * 3) * 0.2;
+      const spikeEffect = spikes.reduce((sum, spike) => {
+        const distance = Math.abs(x - spike.x);
+        return sum + (distance < 30 ? spike.value * (1 - distance / 30) * 0.5 : 0);
+      }, 0);
+      return Math.min(5, Math.max(0, emfValue + noise + spikeEffect));
+    }
 
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        source = audioCtx.createMediaStreamSource(stream);
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-        source.connect(analyser);
-        drawAudio();
-      } catch (err) {
-        alert('Microphone inaccessible : ' + err);
-      }
-
-      // Motion setup
-      if (typeof DeviceMotionEvent.requestPermission === 'function') {
-        // iOS 13+ demande permission pour capteurs de mouvement
-        DeviceMotionEvent.requestPermission()
-          .then(response => {
-            if (response === 'granted') {
-              window.addEventListener('devicemotion', handleMotion);
-            } else {
-              alert('Permission refusée pour les capteurs de mouvement');
-            }
-          })
-          .catch(console.error);
+    function updateEMFDisplay() {
+      const level = Math.floor(emfValue);
+      emfLevel.textContent = level;
+      
+      if (level >= 3) {
+        emfLevel.style.color = '#f00';
+        emfLevel.style.textShadow = '0 0 10px #f00';
+        emfLevel.classList.add('pulse');
+        if (level > maxEmf) {
+          maxEmf = level;
+          playAlertSound();
+        }
+      } else if (level >= 1) {
+        emfLevel.style.color = '#ff0';
+        emfLevel.style.textShadow = '0 0 10px #ff0';
+        emfLevel.classList.remove('pulse');
       } else {
-        // Autres systèmes (Android, desktop)
-        window.addEventListener('devicemotion', handleMotion);
+        emfLevel.style.color = '#0f0';
+        emfLevel.style.textShadow = '0 0 10px #0f0';
+        emfLevel.classList.remove('pulse');
       }
+    }
+
+    function playAlertSound() {
+      alertSound.currentTime = 0;
+      alertSound.play().catch(e => console.log("Son désactivé"));
+    }
+
+    function addSpike() {
+      spikes.push({
+        x: Math.random() * emfCanvas.width,
+        value: 2 + Math.random() * 3,
+        time: Date.now()
+      });
+    }
+
+    function simulateActivity() {
+      if (!isActive) return;
+      emfValue = Math.min(5, Math.max(0, emfValue + (Math.random() * 2 - 0.8)));
+      updateEMFDisplay();
+    }
+
+    function startDetection() {
+      isActive = true;
+      startBtn.disabled = true;
+      statusDiv.textContent = "Détection EMF activée...";
+      staticSound.play().catch(e => console.log("Son désactivé"));
+      animationFrame = requestAnimationFrame(drawEMF);
+      setInterval(simulateActivity, 500);
+    }
+
+    function resetDetection() {
+      isActive = false;
+      emfValue = 0;
+      maxEmf = 0;
+      spikes = [];
+      startBtn.disabled = false;
+      statusDiv.textContent = "Système inactif";
+      emfLevel.style.color = "#0f0";
+      emfLevel.classList.remove('pulse');
+      staticSound.pause();
+      cancelAnimationFrame(animationFrame);
+      ctx.clearRect(0, 0, emfCanvas.width, emfCanvas.height);
+      drawGrid();
     }
 
     startBtn.addEventListener('click', startDetection);
+    simulateBtn.addEventListener('click', () => { if (isActive) addSpike(); });
+    resetBtn.addEventListener('click', resetDetection);
+
+    drawGrid();
   </script>
 </body>
 </html>

@@ -2,276 +2,197 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Détecteur Sonar - Écholocation</title>
+  <title>Sonar comme les chauves-souris</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       background: #000;
-      color: #0af;
+      color: #0ff;
       text-align: center;
       margin: 0;
       padding: 20px;
-      overflow: hidden;
     }
     #container {
       max-width: 600px;
       margin: 0 auto;
-      position: relative;
     }
     canvas {
       background: #000;
       display: block;
       margin: 20px auto;
-      border: 1px solid #0af;
-    }
-    #sonarCanvas {
-      border-radius: 50%;
-    }
-    #mapCanvas {
-      display: none;
+      border: 1px solid #0ff;
     }
     button {
-      padding: 10px 20px;
-      font-size: 1em;
-      margin: 10px;
       background: #002;
-      color: #0af;
-      border: 1px solid #0af;
-      border-radius: 5px;
+      color: #0ff;
+      border: 1px solid #0ff;
+      padding: 10px 20px;
+      margin: 10px;
       cursor: pointer;
-    }
-    button:hover {
-      background: #0af;
-      color: #000;
-    }
-    #controls {
-      margin: 20px 0;
     }
     #status {
       margin: 15px 0;
-      font-size: 1.1em;
-    }
-    .pulse {
-      animation: pulse 1s infinite;
-    }
-    @keyframes pulse {
-      0% { opacity: 0.5; }
-      50% { opacity: 1; }
-      100% { opacity: 0.5; }
+      font-size: 1.2em;
     }
   </style>
 </head>
 <body>
   <div id="container">
-    <h1>Détecteur Sonar - Écholocation</h1>
-    <div id="status">Système inactif - Cliquez sur Démarrer</div>
-    
-    <canvas id="sonarCanvas" width="400" height="400"></canvas>
-    <canvas id="mapCanvas" width="400" height="400"></canvas>
-    
-    <div id="controls">
+    <h1>Détecteur Sonar</h1>
+    <div id="status">Prêt à scanner...</div>
+    <canvas id="sonarCanvas" width="500" height="500"></canvas>
+    <div>
       <button id="startBtn">Démarrer</button>
-      <button id="switchViewBtn">Afficher la Carte</button>
-      <button id="resetBtn">Réinitialiser</button>
+      <button id="stopBtn" disabled>Arrêter</button>
     </div>
   </div>
 
   <script>
-    // Éléments du DOM
-    const startBtn = document.getElementById('startBtn');
-    const switchViewBtn = document.getElementById('switchViewBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const sonarCanvas = document.getElementById('sonarCanvas');
-    const mapCanvas = document.getElementById('mapCanvas');
+    // Configuration
+    const canvas = document.getElementById('sonarCanvas');
+    const ctx = canvas.getContext('2d');
     const statusDiv = document.getElementById('status');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
     
-    // Contextes des canvas
-    const sonarCtx = sonarCanvas.getContext('2d');
-    const mapCtx = mapCanvas.getContext('2d');
+    let audioContext, analyser, microphone;
+    let isScanning = false;
+    let animationId;
+    let scanAngle = 0;
+    const maxDistance = 200;
+    const obstacles = [];
     
-    // Variables d'état
-    let isActive = false;
-    let showMap = false;
-    let audioContext, analyser, dataArray;
-    let environmentMap = [];
-    const MAX_DISTANCE = 200; // Distance maximale en pixels
-    
-    // Initialisation
-    function init() {
-      // Dessiner le sonar vide
-      drawSonar();
-      // Initialiser la carte
-      resetMap();
-    }
-    
-    // Dessin du sonar
-    function drawSonar() {
-      sonarCtx.clearRect(0, 0, sonarCanvas.width, sonarCanvas.height);
+    // Initialiser le canvas
+    function initCanvas() {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Dessiner les cercles concentriques
-      sonarCtx.strokeStyle = 'rgba(0, 170, 255, 0.3)';
-      sonarCtx.lineWidth = 1;
-      
-      for (let r = 50; r <= MAX_DISTANCE; r += 50) {
-        sonarCtx.beginPath();
-        sonarCtx.arc(sonarCanvas.width/2, sonarCanvas.height/2, r, 0, Math.PI * 2);
-        sonarCtx.stroke();
-      }
-      
-      // Dessiner les lignes radiales
-      for (let a = 0; a < 360; a += 30) {
-        const angle = a * Math.PI / 180;
-        sonarCtx.beginPath();
-        sonarCtx.moveTo(sonarCanvas.width/2, sonarCanvas.height/2);
-        sonarCtx.lineTo(
-          sonarCanvas.width/2 + Math.cos(angle) * MAX_DISTANCE,
-          sonarCanvas.height/2 + Math.sin(angle) * MAX_DISTANCE
-        );
-        sonarCtx.stroke();
+      ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
+      for (let r = 50; r <= maxDistance; r += 50) {
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, r, 0, Math.PI*2);
+        ctx.stroke();
       }
     }
     
-    // Initialiser/réinitialiser la carte
-    function resetMap() {
-      mapCtx.fillStyle = '#000';
-      mapCtx.fillRect(0, 0, mapCanvas.width, mapCanvas.height);
-      environmentMap = [];
-    }
-    
-    // Démarrer la détection
-    async function startDetection() {
+    // Démarrer le sonar
+    async function startSonar() {
       try {
+        statusDiv.textContent = "Initialisation du microphone...";
+        
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const source = audioContext.createMediaStreamSource(stream);
         
+        microphone = audioContext.createMediaStreamSource(stream);
         analyser = audioContext.createAnalyser();
         analyser.fftSize = 256;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
         
-        source.connect(analyser);
+        microphone.connect(analyser);
         
-        isActive = true;
-        statusDiv.textContent = "Détection active - Écoute de l'environnement";
-        statusDiv.classList.add('pulse');
+        isScanning = true;
         startBtn.disabled = true;
+        stopBtn.disabled = false;
+        statusDiv.textContent = "Scan en cours...";
         
-        // Lancer l'animation
-        requestAnimationFrame(updateDisplay);
-      } catch (err) {
-        statusDiv.textContent = "Erreur: " + err.message;
+        initCanvas();
+        scanLoop();
+      } catch (error) {
+        statusDiv.textContent = "Erreur: " + error.message;
       }
     }
     
-    // Mettre à jour l'affichage
-    function updateDisplay() {
-      if (!isActive) return;
+    // Boucle principale du sonar
+    function scanLoop() {
+      if (!isScanning) return;
       
+      // Effacer le canvas
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Redessiner la grille
+      ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
+      for (let r = 50; r <= maxDistance; r += 50) {
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, r, 0, Math.PI*2);
+        ctx.stroke();
+      }
+      
+      // Analyser le son
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(dataArray);
       
-      if (showMap) {
-        updateMap();
-      } else {
-        updateSonar();
-      }
-      
-      requestAnimationFrame(updateDisplay);
-    }
-    
-    // Mettre à jour le sonar
-    function updateSonar() {
-      drawSonar();
-      
-      // Analyser les fréquences pour détecter les obstacles
-      const centerX = sonarCanvas.width/2;
-      const centerY = sonarCanvas.height/2;
-      
-      // Prendre la moyenne des hautes fréquences (comme un sonar)
-      let sum = 0;
+      // Calculer la distance basée sur les hautes fréquences
+      let highFreqSum = 0;
       for (let i = dataArray.length/2; i < dataArray.length; i++) {
-        sum += dataArray[i];
+        highFreqSum += dataArray[i];
       }
-      const avg = sum / (dataArray.length/2);
+      const distance = Math.min(maxDistance, highFreqSum / (dataArray.length/2));
       
-      // Convertir en distance (simplifié)
-      const distance = Math.min(MAX_DISTANCE, avg / 255 * MAX_DISTANCE * 1.5);
+      // Mettre à jour l'angle de balayage
+      scanAngle = (scanAngle + 0.02) % (Math.PI * 2);
       
-      // Dessiner le "ping" sonar
-      sonarCtx.strokeStyle = '#0af';
-      sonarCtx.lineWidth = 2;
-      sonarCtx.beginPath();
-      sonarCtx.arc(centerX, centerY, distance, 0, Math.PI * 2);
-      sonarCtx.stroke();
+      // Dessiner le rayon actuel
+      const centerX = canvas.width/2;
+      const centerY = canvas.height/2;
       
-      // Enregistrer dans la carte
-      const angle = Date.now() / 100 % 360; // Simulation de balayage
-      environmentMap.push({
-        angle: angle * Math.PI / 180,
-        distance: distance,
-        intensity: avg / 255
-      });
-    }
-    
-    // Mettre à jour la carte
-    function updateMap() {
-      mapCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      mapCtx.fillRect(0, 0, mapCanvas.width, mapCanvas.height);
+      ctx.strokeStyle = '#0ff';
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(
+        centerX + Math.cos(scanAngle) * distance,
+        centerY + Math.sin(scanAngle) * distance
+      );
+      ctx.stroke();
       
-      const centerX = mapCanvas.width/2;
-      const centerY = mapCanvas.height/2;
-      
-      // Dessiner les obstacles détectés
-      environmentMap.forEach(point => {
-        const x = centerX + Math.cos(point.angle) * point.distance;
-        const y = centerY + Math.sin(point.angle) * point.distance;
-        
-        const size = 2 + point.intensity * 5;
-        const alpha = point.intensity;
-        
-        mapCtx.fillStyle = `rgba(0, 170, 255, ${alpha})`;
-        mapCtx.beginPath();
-        mapCtx.arc(x, y, size, 0, Math.PI * 2);
-        mapCtx.fill();
-      });
-    }
-    
-    // Basculer entre les vues
-    function switchView() {
-      showMap = !showMap;
-      if (showMap) {
-        sonarCanvas.style.display = 'none';
-        mapCanvas.style.display = 'block';
-        switchViewBtn.textContent = 'Afficher le Sonar';
-      } else {
-        sonarCanvas.style.display = 'block';
-        mapCanvas.style.display = 'none';
-        switchViewBtn.textContent = 'Afficher la Carte';
+      // Enregistrer les obstacles
+      if (distance < maxDistance * 0.9) {
+        obstacles.push({
+          x: centerX + Math.cos(scanAngle) * distance,
+          y: centerY + Math.sin(scanAngle) * distance,
+          size: highFreqSum / 5000
+        });
       }
+      
+      // Dessiner les obstacles
+      ctx.fillStyle = '#0ff';
+      obstacles.forEach(obstacle => {
+        ctx.beginPath();
+        ctx.arc(obstacle.x, obstacle.y, obstacle.size, 0, Math.PI*2);
+        ctx.fill();
+      });
+      
+      // Limiter le nombre d'obstacles en mémoire
+      if (obstacles.length > 500) {
+        obstacles.splice(0, 100);
+      }
+      
+      animationId = requestAnimationFrame(scanLoop);
     }
     
-    // Arrêter la détection
-    function stopDetection() {
-      isActive = false;
-      statusDiv.textContent = "Système inactif";
-      statusDiv.classList.remove('pulse');
-      startBtn.disabled = false;
+    // Arrêter le sonar
+    function stopSonar() {
+      isScanning = false;
+      cancelAnimationFrame(animationId);
       
+      if (microphone) {
+        microphone.disconnect();
+      }
       if (audioContext) {
         audioContext.close();
       }
+      
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      statusDiv.textContent = "Scan arrêté";
     }
     
     // Événements
-    startBtn.addEventListener('click', startDetection);
-    switchViewBtn.addEventListener('click', switchView);
-    resetBtn.addEventListener('click', () => {
-      stopDetection();
-      resetMap();
-      drawSonar();
-    });
+    startBtn.addEventListener('click', startSonar);
+    stopBtn.addEventListener('click', stopSonar);
     
-    // Initialiser l'application
-    init();
+    // Initialisation
+    initCanvas();
   </script>
 </body>
 </html>

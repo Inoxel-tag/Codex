@@ -2,283 +2,276 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Détecteur EMF - Supernatural</title>
+  <title>Détecteur Sonar - Écholocation</title>
   <style>
     body {
-      font-family: 'Courier New', monospace;
+      font-family: 'Arial', sans-serif;
       background: #000;
-      color: #0f0;
+      color: #0af;
       text-align: center;
       margin: 0;
       padding: 20px;
       overflow: hidden;
     }
     #container {
-      max-width: 500px;
+      max-width: 600px;
       margin: 0 auto;
-      border: 2px solid #0f0;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px #0f0;
       position: relative;
-      background: rgba(0, 20, 0, 0.3);
-    }
-    h1, h2 {
-      color: #0f0;
-      text-shadow: 0 0 10px #0f0;
-      margin: 5px 0;
-    }
-    #emfLevel {
-      font-size: 1.5em;
-      margin: 20px 0;
-      color: #0f0;
-    }
-    #level {
-      font-size: 1.8em;
-      color: #0f0;
     }
     canvas {
       background: #000;
-      margin: 20px auto;
       display: block;
-      border: 1px solid #0f0;
+      margin: 20px auto;
+      border: 1px solid #0af;
+    }
+    #sonarCanvas {
+      border-radius: 50%;
+    }
+    #mapCanvas {
+      display: none;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin: 10px;
+      background: #002;
+      color: #0af;
+      border: 1px solid #0af;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0af;
+      color: #000;
+    }
+    #controls {
+      margin: 20px 0;
     }
     #status {
       margin: 15px 0;
       font-size: 1.1em;
     }
-    .controls {
-      margin: 15px 0;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 1em;
-      margin: 5px;
-      cursor: pointer;
-      background: #000;
-      color: #0f0;
-      border: 1px solid #0f0;
-      border-radius: 5px;
-      transition: all 0.3s;
-    }
-    button:hover {
-      background: #0f0;
-      color: #000;
-      box-shadow: 0 0 15px #0f0;
-    }
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    #instructions {
-      margin-top: 20px;
-      font-size: 0.9em;
-      color: #0a0;
-    }
-    .scan-line {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: rgba(0, 255, 0, 0.5);
-      box-shadow: 0 0 10px #0f0;
-      animation: scan 4s linear infinite;
-      opacity: 0;
-    }
-    @keyframes scan {
-      0% { top: 0; opacity: 0; }
-      5% { opacity: 1; }
-      95% { opacity: 1; }
-      100% { top: 100%; opacity: 0; }
-    }
     .pulse {
-      animation: pulse 0.5s infinite alternate;
+      animation: pulse 1s infinite;
     }
     @keyframes pulse {
-      from { opacity: 0.5; }
-      to { opacity: 1; }
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
     }
   </style>
 </head>
 <body>
   <div id="container">
-    <div class="scan-line"></div>
-    <h1>DÉTECTEUR EMF</h1>
-    <h2>MODÈLE SUPERNATURAL</h2>
+    <h1>Détecteur Sonar - Écholocation</h1>
+    <div id="status">Système inactif - Cliquez sur Démarrer</div>
     
-    <div id="emfLevel">NIVEAU EMF: <span id="level">0</span></div>
+    <canvas id="sonarCanvas" width="400" height="400"></canvas>
+    <canvas id="mapCanvas" width="400" height="400"></canvas>
     
-    <canvas id="emfCanvas" width="400" height="200"></canvas>
-    
-    <div id="status">Système inactif</div>
-    
-    <div class="controls">
-      <button id="startBtn">ACTIVER</button>
-      <button id="simulateBtn">SIMULER UNE ACTIVITÉ</button>
-      <button id="resetBtn">RÉINITIALISER</button>
-    </div>
-    
-    <div id="instructions">
-      <p>Niveau 1: Présence spirituelle faible</p>
-      <p>Niveau 2: Entité mineure</p>
-      <p>Niveau 3: Fantôme/Esprit</p>
-      <p>Niveau 4: Démon/Entité puissante</p>
-      <p>Niveau 5: Présence extrêmement malveillante</p>
+    <div id="controls">
+      <button id="startBtn">Démarrer</button>
+      <button id="switchViewBtn">Afficher la Carte</button>
+      <button id="resetBtn">Réinitialiser</button>
     </div>
   </div>
 
-  <audio id="alertSound" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
-  <audio id="staticSound" src="https://assets.mixkit.co/sfx/preview/mixkit-radio-static-1680.mp3" preload="auto" loop></audio>
-
   <script>
+    // Éléments du DOM
     const startBtn = document.getElementById('startBtn');
-    const simulateBtn = document.getElementById('simulateBtn');
+    const switchViewBtn = document.getElementById('switchViewBtn');
     const resetBtn = document.getElementById('resetBtn');
-    const emfCanvas = document.getElementById('emfCanvas');
-    const ctx = emfCanvas.getContext('2d');
-    const emfLevel = document.getElementById('level');
+    const sonarCanvas = document.getElementById('sonarCanvas');
+    const mapCanvas = document.getElementById('mapCanvas');
     const statusDiv = document.getElementById('status');
-    const alertSound = document.getElementById('alertSound');
-    const staticSound = document.getElementById('staticSound');
-
+    
+    // Contextes des canvas
+    const sonarCtx = sonarCanvas.getContext('2d');
+    const mapCtx = mapCanvas.getContext('2d');
+    
+    // Variables d'état
     let isActive = false;
-    let emfValue = 0;
-    let maxEmf = 0;
-    let animationFrame;
-    let spikes = [];
-
-    function drawGrid() {
-      ctx.strokeStyle = 'rgba(0, 255, 0, 0.2)';
-      ctx.lineWidth = 0.5;
-      for (let x = 0; x <= emfCanvas.width; x += 20) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, emfCanvas.height);
-        ctx.stroke();
-      }
-      for (let y = 0; y <= emfCanvas.height; y += 20) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(emfCanvas.width, y);
-        ctx.stroke();
-      }
+    let showMap = false;
+    let audioContext, analyser, dataArray;
+    let environmentMap = [];
+    const MAX_DISTANCE = 200; // Distance maximale en pixels
+    
+    // Initialisation
+    function init() {
+      // Dessiner le sonar vide
+      drawSonar();
+      // Initialiser la carte
+      resetMap();
     }
-
-    function drawEMF() {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-      ctx.fillRect(0, 0, emfCanvas.width, emfCanvas.height);
-      drawGrid();
-
-      ctx.strokeStyle = '#0f0';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, emfCanvas.height - (emfValue / 5 * emfCanvas.height));
-
-      for (let i = 1; i < emfCanvas.width; i++) {
-        const x = i;
-        const y = emfCanvas.height - (getEMFValueAtPosition(i) / 5 * emfCanvas.height);
-        ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-
-      if (Math.random() < 0.02 && isActive) addSpike();
-
-      spikes.forEach((spike, index) => {
-        const age = Date.now() - spike.time;
-        if (age > 2000) spikes.splice(index, 1);
-        else {
-          const alpha = 1 - (age / 2000);
-          const height = spike.value / 5 * emfCanvas.height * alpha;
-          ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`;
-          ctx.fillRect(spike.x - 2, emfCanvas.height - height, 4, height);
-        }
-      });
-
-      animationFrame = requestAnimationFrame(drawEMF);
-    }
-
-    function getEMFValueAtPosition(x) {
-      const timeFactor = Date.now() / 1000;
-      const noise = Math.sin(x * 0.1 + timeFactor * 3) * 0.2;
-      const spikeEffect = spikes.reduce((sum, spike) => {
-        const distance = Math.abs(x - spike.x);
-        return sum + (distance < 30 ? spike.value * (1 - distance / 30) * 0.5 : 0);
-      }, 0);
-      return Math.min(5, Math.max(0, emfValue + noise + spikeEffect));
-    }
-
-    function updateEMFDisplay() {
-      const level = Math.floor(emfValue);
-      emfLevel.textContent = level;
+    
+    // Dessin du sonar
+    function drawSonar() {
+      sonarCtx.clearRect(0, 0, sonarCanvas.width, sonarCanvas.height);
       
-      if (level >= 3) {
-        emfLevel.style.color = '#f00';
-        emfLevel.style.textShadow = '0 0 10px #f00';
-        emfLevel.classList.add('pulse');
-        if (level > maxEmf) {
-          maxEmf = level;
-          playAlertSound();
-        }
-      } else if (level >= 1) {
-        emfLevel.style.color = '#ff0';
-        emfLevel.style.textShadow = '0 0 10px #ff0';
-        emfLevel.classList.remove('pulse');
-      } else {
-        emfLevel.style.color = '#0f0';
-        emfLevel.style.textShadow = '0 0 10px #0f0';
-        emfLevel.classList.remove('pulse');
+      // Dessiner les cercles concentriques
+      sonarCtx.strokeStyle = 'rgba(0, 170, 255, 0.3)';
+      sonarCtx.lineWidth = 1;
+      
+      for (let r = 50; r <= MAX_DISTANCE; r += 50) {
+        sonarCtx.beginPath();
+        sonarCtx.arc(sonarCanvas.width/2, sonarCanvas.height/2, r, 0, Math.PI * 2);
+        sonarCtx.stroke();
+      }
+      
+      // Dessiner les lignes radiales
+      for (let a = 0; a < 360; a += 30) {
+        const angle = a * Math.PI / 180;
+        sonarCtx.beginPath();
+        sonarCtx.moveTo(sonarCanvas.width/2, sonarCanvas.height/2);
+        sonarCtx.lineTo(
+          sonarCanvas.width/2 + Math.cos(angle) * MAX_DISTANCE,
+          sonarCanvas.height/2 + Math.sin(angle) * MAX_DISTANCE
+        );
+        sonarCtx.stroke();
       }
     }
-
-    function playAlertSound() {
-      alertSound.currentTime = 0;
-      alertSound.play().catch(e => console.log("Son désactivé"));
+    
+    // Initialiser/réinitialiser la carte
+    function resetMap() {
+      mapCtx.fillStyle = '#000';
+      mapCtx.fillRect(0, 0, mapCanvas.width, mapCanvas.height);
+      environmentMap = [];
     }
-
-    function addSpike() {
-      spikes.push({
-        x: Math.random() * emfCanvas.width,
-        value: 2 + Math.random() * 3,
-        time: Date.now()
+    
+    // Démarrer la détection
+    async function startDetection() {
+      try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const source = audioContext.createMediaStreamSource(stream);
+        
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        
+        source.connect(analyser);
+        
+        isActive = true;
+        statusDiv.textContent = "Détection active - Écoute de l'environnement";
+        statusDiv.classList.add('pulse');
+        startBtn.disabled = true;
+        
+        // Lancer l'animation
+        requestAnimationFrame(updateDisplay);
+      } catch (err) {
+        statusDiv.textContent = "Erreur: " + err.message;
+      }
+    }
+    
+    // Mettre à jour l'affichage
+    function updateDisplay() {
+      if (!isActive) return;
+      
+      analyser.getByteFrequencyData(dataArray);
+      
+      if (showMap) {
+        updateMap();
+      } else {
+        updateSonar();
+      }
+      
+      requestAnimationFrame(updateDisplay);
+    }
+    
+    // Mettre à jour le sonar
+    function updateSonar() {
+      drawSonar();
+      
+      // Analyser les fréquences pour détecter les obstacles
+      const centerX = sonarCanvas.width/2;
+      const centerY = sonarCanvas.height/2;
+      
+      // Prendre la moyenne des hautes fréquences (comme un sonar)
+      let sum = 0;
+      for (let i = dataArray.length/2; i < dataArray.length; i++) {
+        sum += dataArray[i];
+      }
+      const avg = sum / (dataArray.length/2);
+      
+      // Convertir en distance (simplifié)
+      const distance = Math.min(MAX_DISTANCE, avg / 255 * MAX_DISTANCE * 1.5);
+      
+      // Dessiner le "ping" sonar
+      sonarCtx.strokeStyle = '#0af';
+      sonarCtx.lineWidth = 2;
+      sonarCtx.beginPath();
+      sonarCtx.arc(centerX, centerY, distance, 0, Math.PI * 2);
+      sonarCtx.stroke();
+      
+      // Enregistrer dans la carte
+      const angle = Date.now() / 100 % 360; // Simulation de balayage
+      environmentMap.push({
+        angle: angle * Math.PI / 180,
+        distance: distance,
+        intensity: avg / 255
       });
     }
-
-    function simulateActivity() {
-      if (!isActive) return;
-      emfValue = Math.min(5, Math.max(0, emfValue + (Math.random() * 2 - 0.8)));
-      updateEMFDisplay();
+    
+    // Mettre à jour la carte
+    function updateMap() {
+      mapCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      mapCtx.fillRect(0, 0, mapCanvas.width, mapCanvas.height);
+      
+      const centerX = mapCanvas.width/2;
+      const centerY = mapCanvas.height/2;
+      
+      // Dessiner les obstacles détectés
+      environmentMap.forEach(point => {
+        const x = centerX + Math.cos(point.angle) * point.distance;
+        const y = centerY + Math.sin(point.angle) * point.distance;
+        
+        const size = 2 + point.intensity * 5;
+        const alpha = point.intensity;
+        
+        mapCtx.fillStyle = `rgba(0, 170, 255, ${alpha})`;
+        mapCtx.beginPath();
+        mapCtx.arc(x, y, size, 0, Math.PI * 2);
+        mapCtx.fill();
+      });
     }
-
-    function startDetection() {
-      isActive = true;
-      startBtn.disabled = true;
-      statusDiv.textContent = "Détection EMF activée...";
-      staticSound.play().catch(e => console.log("Son désactivé"));
-      animationFrame = requestAnimationFrame(drawEMF);
-      setInterval(simulateActivity, 500);
+    
+    // Basculer entre les vues
+    function switchView() {
+      showMap = !showMap;
+      if (showMap) {
+        sonarCanvas.style.display = 'none';
+        mapCanvas.style.display = 'block';
+        switchViewBtn.textContent = 'Afficher le Sonar';
+      } else {
+        sonarCanvas.style.display = 'block';
+        mapCanvas.style.display = 'none';
+        switchViewBtn.textContent = 'Afficher la Carte';
+      }
     }
-
-    function resetDetection() {
+    
+    // Arrêter la détection
+    function stopDetection() {
       isActive = false;
-      emfValue = 0;
-      maxEmf = 0;
-      spikes = [];
-      startBtn.disabled = false;
       statusDiv.textContent = "Système inactif";
-      emfLevel.style.color = "#0f0";
-      emfLevel.classList.remove('pulse');
-      staticSound.pause();
-      cancelAnimationFrame(animationFrame);
-      ctx.clearRect(0, 0, emfCanvas.width, emfCanvas.height);
-      drawGrid();
+      statusDiv.classList.remove('pulse');
+      startBtn.disabled = false;
+      
+      if (audioContext) {
+        audioContext.close();
+      }
     }
-
+    
+    // Événements
     startBtn.addEventListener('click', startDetection);
-    simulateBtn.addEventListener('click', () => { if (isActive) addSpike(); });
-    resetBtn.addEventListener('click', resetDetection);
-
-    drawGrid();
+    switchViewBtn.addEventListener('click', switchView);
+    resetBtn.addEventListener('click', () => {
+      stopDetection();
+      resetMap();
+      drawSonar();
+    });
+    
+    // Initialiser l'application
+    init();
   </script>
 </body>
 </html>

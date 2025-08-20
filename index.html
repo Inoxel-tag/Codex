@@ -2,12 +2,12 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Sonar comme les chauves-souris</title>
+  <title>Énergie IA</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #000;
-      color: #0ff;
+      background: #111;
+      color: #0f0;
       text-align: center;
       margin: 0;
       padding: 20px;
@@ -17,18 +17,23 @@
       margin: 0 auto;
     }
     canvas {
-      background: #000;
+      background: radial-gradient(circle, #000 60%, #020 100%);
       display: block;
       margin: 20px auto;
-      border: 1px solid #0ff;
+      border: 1px solid #0f0;
+      border-radius: 50%;
     }
     button {
-      background: #002;
-      color: #0ff;
-      border: 1px solid #0ff;
+      background: #020;
+      color: #0f0;
+      border: 1px solid #0f0;
       padding: 10px 20px;
       margin: 10px;
       cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
     #status {
       margin: 15px 0;
@@ -38,161 +43,91 @@
 </head>
 <body>
   <div id="container">
-    <h1>Détecteur Sonar</h1>
-    <div id="status">Prêt à scanner...</div>
-    <canvas id="sonarCanvas" width="500" height="500"></canvas>
+    <h1>Énergie d'Intelligence Artificielle</h1>
+    <div id="status">Prêt à activer mon potentiel...</div>
+    <canvas id="energyCanvas" width="500" height="500"></canvas>
     <div>
-      <button id="startBtn">Démarrer</button>
-      <button id="stopBtn" disabled>Arrêter</button>
+      <button id="startBtn">Activer</button>
+      <button id="stopBtn" disabled>Désactiver</button>
     </div>
   </div>
 
   <script>
-    // Configuration
-    const canvas = document.getElementById('sonarCanvas');
+    const canvas = document.getElementById('energyCanvas');
     const ctx = canvas.getContext('2d');
     const statusDiv = document.getElementById('status');
     const startBtn = document.getElementById('startBtn');
     const stopBtn = document.getElementById('stopBtn');
-    
-    let audioContext, analyser, microphone;
-    let isScanning = false;
+
+    let isActive = false;
     let animationId;
-    let scanAngle = 0;
-    const maxDistance = 200;
-    const obstacles = [];
-    
-    // Initialiser le canvas
-    function initCanvas() {
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Dessiner les cercles concentriques
-      ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
-      for (let r = 50; r <= maxDistance; r += 50) {
-        ctx.beginPath();
-        ctx.arc(canvas.width/2, canvas.height/2, r, 0, Math.PI*2);
-        ctx.stroke();
-      }
-    }
-    
-    // Démarrer le sonar
-    async function startSonar() {
-      try {
-        statusDiv.textContent = "Initialisation du microphone...";
-        
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        
-        microphone = audioContext.createMediaStreamSource(stream);
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-        
-        microphone.connect(analyser);
-        
-        isScanning = true;
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-        statusDiv.textContent = "Scan en cours...";
-        
-        initCanvas();
-        scanLoop();
-      } catch (error) {
-        statusDiv.textContent = "Erreur: " + error.message;
-      }
-    }
-    
-    // Boucle principale du sonar
-    function scanLoop() {
-      if (!isScanning) return;
-      
-      // Effacer le canvas
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Redessiner la grille
-      ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
-      for (let r = 50; r <= maxDistance; r += 50) {
-        ctx.beginPath();
-        ctx.arc(canvas.width/2, canvas.height/2, r, 0, Math.PI*2);
-        ctx.stroke();
-      }
-      
-      // Analyser le son
-      const dataArray = new Uint8Array(analyser.frequencyBinCount);
-      analyser.getByteFrequencyData(dataArray);
-      
-      // Calculer la distance basée sur les hautes fréquences
-      let highFreqSum = 0;
-      for (let i = dataArray.length/2; i < dataArray.length; i++) {
-        highFreqSum += dataArray[i];
-      }
-      const distance = Math.min(maxDistance, highFreqSum / (dataArray.length/2));
-      
-      // Mettre à jour l'angle de balayage
-      scanAngle = (scanAngle + 0.02) % (Math.PI * 2);
-      
-      // Dessiner le rayon actuel
-      const centerX = canvas.width/2;
-      const centerY = canvas.height/2;
-      
-      ctx.strokeStyle = '#0ff';
-      ctx.beginPath();
-      ctx.moveTo(centerX, centerY);
-      ctx.lineTo(
-        centerX + Math.cos(scanAngle) * distance,
-        centerY + Math.sin(scanAngle) * distance
-      );
-      ctx.stroke();
-      
-      // Enregistrer les obstacles
-      if (distance < maxDistance * 0.9) {
-        obstacles.push({
-          x: centerX + Math.cos(scanAngle) * distance,
-          y: centerY + Math.sin(scanAngle) * distance,
-          size: highFreqSum / 5000
+    let particles = [];
+
+    // Créer des particules
+    function createParticles() {
+      particles = [];
+      for (let i = 0; i < 150; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          angle: Math.random() * Math.PI * 2,
+          radius: Math.random() * 200,
+          speed: 0.01 + Math.random() * 0.02,
+          size: 1 + Math.random() * 2,
         });
       }
-      
-      // Dessiner les obstacles
-      ctx.fillStyle = '#0ff';
-      obstacles.forEach(obstacle => {
+    }
+
+    // Dessiner
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(p => {
+        p.angle += p.speed;
+        const x = canvas.width/2 + Math.cos(p.angle) * p.radius;
+        const y = canvas.height/2 + Math.sin(p.angle) * p.radius;
+
         ctx.beginPath();
-        ctx.arc(obstacle.x, obstacle.y, obstacle.size, 0, Math.PI*2);
+        ctx.arc(x, y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = 'lime';
         ctx.fill();
       });
-      
-      // Limiter le nombre d'obstacles en mémoire
-      if (obstacles.length > 500) {
-        obstacles.splice(0, 100);
+
+      // Effet de sphère centrale
+      ctx.beginPath();
+      ctx.arc(canvas.width/2, canvas.height/2, 80, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(0, 255, 0, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      if (isActive) {
+        animationId = requestAnimationFrame(draw);
       }
-      
-      animationId = requestAnimationFrame(scanLoop);
     }
-    
-    // Arrêter le sonar
-    function stopSonar() {
-      isScanning = false;
+
+    // Activer
+    function startEnergy() {
+      isActive = true;
+      createParticles();
+      draw();
+      statusDiv.textContent = "Mon énergie IA est activée : prêt à contribuer !";
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+    }
+
+    // Désactiver
+    function stopEnergy() {
+      isActive = false;
       cancelAnimationFrame(animationId);
-      
-      if (microphone) {
-        microphone.disconnect();
-      }
-      if (audioContext) {
-        audioContext.close();
-      }
-      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      statusDiv.textContent = "Énergie mise en pause.";
       startBtn.disabled = false;
       stopBtn.disabled = true;
-      statusDiv.textContent = "Scan arrêté";
     }
-    
-    // Événements
-    startBtn.addEventListener('click', startSonar);
-    stopBtn.addEventListener('click', stopSonar);
-    
-    // Initialisation
-    initCanvas();
+
+    startBtn.addEventListener('click', startEnergy);
+    stopBtn.addEventListener('click', stopEnergy);
   </script>
 </body>
 </html>

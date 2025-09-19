@@ -1,105 +1,72 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Quiz Mystique</title>
-  <style>
-    body {
-      font-family: 'Georgia', serif;
-      background: #1a1a1a;
-      color: #f8f8f8;
-      text-align: center;
-      padding: 30px;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: #2c2c2c;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 0 15px #000;
-    }
-    .btn {
-      display: block;
-      margin: 10px auto;
-      padding: 10px 20px;
-      background: #e2c36e;
-      color: #1a1a1a;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    .btn:hover {
-      transform: scale(1.05);
-    }
-  </style>
-</head>
-<body>
-
-  <h1>📜 Quiz du Grimoire Mystique</h1>
-  <div class="container" id="game">Chargement...</div>
-
-  <script>
-    let data = {};
-    let currentCategory = "";
-    let currentIndex = 0;
-    let score = 0;
-
-    fetch('questions.json')
-      .then(res => res.json())
-      .then(json => {
-        data = json;
-        showCategories();
-      });
-
-    function showCategories() {
-      const game = document.getElementById("game");
-      let html = "<h2>Choisis une catégorie :</h2>";
-      Object.keys(data).forEach(cat => {
-        html += `<button class="btn" onclick="startQuiz('${cat}')">${cat}</button>`;
-      });
-      game.innerHTML = html;
-    }
-
-    function startQuiz(category) {
-      currentCategory = category;
-      currentIndex = 0;
-      score = 0;
-      showQuestion();
-    }
-
-    function showQuestion() {
-      const game = document.getElementById("game");
-      const q = data[currentCategory][currentIndex];
-      let html = `<h2>${currentCategory.toUpperCase()}</h2>`;
-      html += `<div>${q.q}</div>`;
-      q.options.forEach((opt, i) => {
-        html += `<button class="btn" onclick="checkAnswer(${i})">${opt}</button>`;
-      });
-      game.innerHTML = html;
-    }
-
-    function checkAnswer(i) {
-      const q = data[currentCategory][currentIndex];
-      if (i === q.answer) score++;
-      currentIndex++;
-      if (currentIndex < data[currentCategory].length) {
-        showQuestion();
-      } else {
-        endQuiz();
-      }
-    }
-
-    function endQuiz() {
-      const game = document.getElementById("game");
-      game.innerHTML = `
-        <h2>✨ Quiz terminé ! ✨</h2>
-        <p>Score : ${score} / ${data[currentCategory].length}</p>
-        <button class="btn" onclick="showCategories()">Rejouer</button>
-      `;
-    }
-  </script>
-
-</body>
-</html>
+{
+  "science": [
+    {"q":"Quel est l’élément chimique 'O' ?", "options":["Or","Oxygène","Osmium"], "answer":1},
+    {"q":"Combien de planètes dans le système solaire ?", "options":["7","8","9"], "answer":1},
+    {"q":"Quelle est la vitesse de la lumière ?", "options":["300 000 km/s","150 000 km/s","1 000 km/s"], "answer":0},
+    {"q":"Quel organe pompe le sang ?", "options":["Poumons","Foie","Cœur"], "answer":2},
+    {"q":"Quel gaz respirons-nous principalement ?", "options":["Oxygène","Azote","Hydrogène"], "answer":1}
+  ],
+  "histoire": [
+    {"q":"Qui était Napoléon Bonaparte ?", "options":["Un peintre","Un empereur","Un astronaute"], "answer":1},
+    {"q":"En quelle année débute la Révolution française ?", "options":["1789","1812","1664"], "answer":0},
+    {"q":"Où se trouvait l’Empire Inca ?", "options":["Afrique","Amérique du Sud","Asie"], "answer":1},
+    {"q":"Qui a découvert l’Amérique ?", "options":["Christophe Colomb","Marco Polo","Vasco de Gama"], "answer":0},
+    {"q":"Quel mur est tombé en 1989 ?", "options":["Mur de Chine","Mur de Berlin","Mur de Rome"], "answer":1}
+  ],
+  "geographie": [
+    {"q":"Quelle est la capitale de la France ?", "options":["Berlin","Paris","Rome"], "answer":1},
+    {"q":"Quel est le plus grand océan ?", "options":["Atlantique","Pacifique","Indien"], "answer":1},
+    {"q":"Quel continent a le plus de pays ?", "options":["Afrique","Europe","Asie"], "answer":0},
+    {"q":"Où se trouve le mont Everest ?", "options":["Népal","Suisse","Japon"], "answer":0},
+    {"q":"Quel pays a le drapeau rouge avec une feuille d’érable ?", "options":["Canada","Japon","Brésil"], "answer":0}
+  ],
+  "magie": [
+    {"q":"Nom de l’école d’Harry Potter ?", "options":["Poudlard","Mordor","Camelot"], "answer":0},
+    {"q":"Objet pour voler dans Harry Potter ?", "options":["Baguette","Balai","Anneau"], "answer":1},
+    {"q":"Quel sort ouvre les portes ?", "options":["Alohomora","Expelliarmus","Lumos"], "answer":0},
+    {"q":"Pierre qui rend invisible ?", "options":["Pierre de lune","Cape d’invisibilité","Pierre philosophale"], "answer":2},
+    {"q":"Qui est le mage noir ?", "options":["Dumbledore","Voldemort","Gandalf"], "answer":1}
+  ],
+  "animaux": [
+    {"q":"Plus grand mammifère ?", "options":["Éléphant","Baleine bleue","Girafe"], "answer":1},
+    {"q":"Combien de pattes a une araignée ?", "options":["6","8","10"], "answer":1},
+    {"q":"Où vit le panda géant ?", "options":["Chine","Brésil","Inde"], "answer":0},
+    {"q":"Quel animal pond des œufs ?", "options":["Chat","Ornithorynque","Cheval"], "answer":1},
+    {"q":"Quel est le cri du lion ?", "options":["Miaule","Rugit","Aboie"], "answer":1}
+  ],
+  "sport": [
+    {"q":"Combien de joueurs au foot par équipe ?", "options":["9","11","7"], "answer":1},
+    {"q":"Combien de points pour un panier à 3 points ?", "options":["3","2","1"], "answer":0},
+    {"q":"Quel sport se joue à Roland Garros ?", "options":["Tennis","Football","Rugby"], "answer":0},
+    {"q":"Combien de périodes au basket ?", "options":["2","3","4"], "answer":2},
+    {"q":"Quel pays a inventé le judo ?", "options":["Chine","Japon","Corée"], "answer":1}
+  ],
+  "art": [
+    {"q":"Qui a peint la Joconde ?", "options":["Van Gogh","Léonard de Vinci","Picasso"], "answer":1},
+    {"q":"Quel art utilise de la terre cuite ?", "options":["Peinture","Sculpture","Musique"], "answer":1},
+    {"q":"La Tour Eiffel est un symbole de ?", "options":["Paris","Rome","Londres"], "answer":0},
+    {"q":"Quel instrument a des cordes ?", "options":["Flûte","Guitare","Trompette"], "answer":1},
+    {"q":"La Chapelle Sixtine est à ?", "options":["Paris","Rome","Madrid"], "answer":1}
+  ],
+  "mathematiques": [
+    {"q":"Combien font 7×8 ?", "options":["56","48","64"], "answer":0},
+    {"q":"Combien de côtés a un hexagone ?", "options":["5","6","7"], "answer":1},
+    {"q":"Nombre premier ?", "options":["4","6","7"], "answer":2},
+    {"q":"Combien font 100/4 ?", "options":["20","25","30"], "answer":1},
+    {"q":"Pi vaut environ ?", "options":["2.14","3.14","4.14"], "answer":1}
+  ],
+  "technologie": [
+    {"q":"Qui a créé Microsoft ?", "options":["Steve Jobs","Bill Gates","Elon Musk"], "answer":1},
+    {"q":"Quel langage pour le web ?", "options":["HTML","Python","C++"], "answer":0},
+    {"q":"Que fait un CPU ?", "options":["Stocke","Traite","Affiche"], "answer":1},
+    {"q":"Android est un ?", "options":["Système d’exploitation","Navigateur","Jeu"], "answer":0},
+    {"q":"Inventeur de l’iPhone ?", "options":["Elon Musk","Steve Jobs","Bill Gates"], "answer":1}
+  ],
+  "cinema": [
+    {"q":"Qui est Dark Vador ?", "options":["Héros","Méchant","Robot"], "answer":1},
+    {"q":"Qui a réalisé Titanic ?", "options":["Spielberg","James Cameron","Nolan"], "answer":1},
+    {"q":"Quel héros est milliardaire ?", "options":["Batman","Spider-Man","Superman"], "answer":0},
+    {"q":"Quel studio fait Toy Story ?", "options":["Pixar","Dreamworks","Warner"], "answer":0},
+    {"q":"Quel anneau est au centre du Seigneur des Anneaux ?", "options":["Anneau du Temps","Anneau Unique","Anneau Sacré"], "answer":1}
+  ]
+}

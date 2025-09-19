@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Quiz Magique</title>
+  <meta charset="UTF-8">
+  <title>Quiz Mystique</title>
   <style>
     body {
       font-family: 'Georgia', serif;
@@ -10,10 +10,6 @@
       color: #f8f8f8;
       text-align: center;
       padding: 30px;
-    }
-    h1 {
-      color: #e2c36e;
-      text-shadow: 0 0 10px #e2c36e;
     }
     .container {
       max-width: 600px;
@@ -33,88 +29,74 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
-      transition: transform 0.2s;
     }
     .btn:hover {
       transform: scale(1.05);
-    }
-    .question {
-      margin: 20px 0;
-      font-size: 18px;
     }
   </style>
 </head>
 <body>
 
   <h1>📜 Quiz du Grimoire Mystique</h1>
-
-  <div class="container" id="game">
-    <h2>Choisis une catégorie :</h2>
-    <button class="btn" onclick="startQuiz('science')">⚗️ Sciences</button>
-    <button class="btn" onclick="startQuiz('histoire')">🏛️ Histoire</button>
-    <button class="btn" onclick="startQuiz('magie')">🔮 Magie</button>
-    <button class="btn" onclick="startQuiz('animaux')">🐾 Animaux</button>
-  </div>
+  <div class="container" id="game">Chargement...</div>
 
   <script>
-    const questions = {
-      science: [
-        {q:"Quel est l’élément chimique 'O' ?", options:["Or","Oxygène","Osmium"], answer:1},
-        {q:"Combien y a-t-il de planètes dans le système solaire ?", options:["7","8","9"], answer:1},
-      ],
-      histoire: [
-        {q:"Qui était Napoléon Bonaparte ?", options:["Un peintre","Un empereur","Un astronaute"], answer:1},
-        {q:"En quelle année la Révolution française a-t-elle commencé ?", options:["1789","1812","1664"], answer:0},
-      ],
-      magie: [
-        {q:"Comment s'appelle l’école de magie d’Harry Potter ?", options:["Poudlard","Mordor","Camelot"], answer:0},
-        {q:"Quel est l’ingrédient principal d’une potion de soin ?", options:["Mandragore","Pierre de lune","Eau bénite"], answer:0},
-      ],
-      animaux: [
-        {q:"Quel est le plus grand mammifère ?", options:["Éléphant","Baleine bleue","Girafe"], answer:1},
-        {q:"Combien de pattes a une araignée ?", options:["6","8","10"], answer:1},
-      ]
-    };
-
+    let data = {};
     let currentCategory = "";
     let currentIndex = 0;
     let score = 0;
 
-    function startQuiz(category){
+    fetch('questions.json')
+      .then(res => res.json())
+      .then(json => {
+        data = json;
+        showCategories();
+      });
+
+    function showCategories() {
+      const game = document.getElementById("game");
+      let html = "<h2>Choisis une catégorie :</h2>";
+      Object.keys(data).forEach(cat => {
+        html += `<button class="btn" onclick="startQuiz('${cat}')">${cat}</button>`;
+      });
+      game.innerHTML = html;
+    }
+
+    function startQuiz(category) {
       currentCategory = category;
       currentIndex = 0;
       score = 0;
       showQuestion();
     }
 
-    function showQuestion(){
+    function showQuestion() {
       const game = document.getElementById("game");
-      const q = questions[currentCategory][currentIndex];
-      let html = `<h2>Question ${currentIndex+1}/${questions[currentCategory].length}</h2>`;
-      html += `<div class="question">${q.q}</div>`;
-      q.options.forEach((opt,i)=>{
+      const q = data[currentCategory][currentIndex];
+      let html = `<h2>${currentCategory.toUpperCase()}</h2>`;
+      html += `<div>${q.q}</div>`;
+      q.options.forEach((opt, i) => {
         html += `<button class="btn" onclick="checkAnswer(${i})">${opt}</button>`;
       });
       game.innerHTML = html;
     }
 
-    function checkAnswer(i){
-      const q = questions[currentCategory][currentIndex];
-      if(i === q.answer) score++;
+    function checkAnswer(i) {
+      const q = data[currentCategory][currentIndex];
+      if (i === q.answer) score++;
       currentIndex++;
-      if(currentIndex < questions[currentCategory].length){
+      if (currentIndex < data[currentCategory].length) {
         showQuestion();
       } else {
         endQuiz();
       }
     }
 
-    function endQuiz(){
+    function endQuiz() {
       const game = document.getElementById("game");
       game.innerHTML = `
         <h2>✨ Quiz terminé ! ✨</h2>
-        <p>Score : ${score} / ${questions[currentCategory].length}</p>
-        <button class="btn" onclick="location.reload()">Rejouer</button>
+        <p>Score : ${score} / ${data[currentCategory].length}</p>
+        <button class="btn" onclick="showCategories()">Rejouer</button>
       `;
     }
   </script>

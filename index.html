@@ -2,104 +2,166 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quiz Mystique</title>
+  <title>Quiz App</title>
   <style>
     body {
-      font-family: 'Georgia', serif;
-      background: #1a1a1a;
-      color: #f8f8f8;
-      text-align: center;
-      padding: 30px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
     }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: #2c2c2c;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 0 15px #000;
+    h1 {
+      margin-top: 30px;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
     }
-    .btn {
-      display: block;
-      margin: 10px auto;
-      padding: 10px 20px;
-      background: #e2c36e;
-      color: #1a1a1a;
+    #categories {
+      margin-top: 40px;
+    }
+    .category-btn {
+      background: #fff;
+      color: #2575fc;
       border: none;
-      border-radius: 8px;
+      padding: 15px 30px;
+      margin: 10px;
+      font-size: 18px;
+      border-radius: 10px;
       cursor: pointer;
-      font-size: 16px;
+      transition: 0.3s;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
-    .btn:hover {
+    .category-btn:hover {
+      transform: scale(1.1);
+      background: #f0f0f0;
+    }
+    #quiz {
+      margin-top: 50px;
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      width: 90%;
+      max-width: 600px;
+    }
+    .question {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+    .answers button {
+      display: block;
+      width: 80%;
+      margin: 10px auto;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: #fff;
+      color: #2575fc;
+      transition: 0.3s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .answers button:hover {
+      background: #f0f0f0;
       transform: scale(1.05);
+    }
+    .score {
+      margin-top: 20px;
+      font-size: 1.2em;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <h1>📜 Quiz du Grimoire Mystique</h1>
-  <div class="container" id="game">Chargement...</div>
+<h1>Quiz App</h1>
 
-  <script>
-    let data = {};
-    let currentCategory = "";
-    let currentIndex = 0;
-    let score = 0;
+<div id="categories"></div>
 
-    fetch('questions.json')
-      .then(res => res.json())
-      .then(json => {
-        data = json;
-        showCategories();
-      });
+<div id="quiz" style="display:none;">
+  <div class="question" id="question"></div>
+  <div class="answers" id="answers"></div>
+  <div class="score" id="score"></div>
+</div>
 
-    function showCategories() {
-      const game = document.getElementById("game");
-      let html = "<h2>Choisis une catégorie :</h2>";
-      Object.keys(data).forEach(cat => {
-        html += `<button class="btn" onclick="startQuiz('${cat}')">${cat}</button>`;
-      });
-      game.innerHTML = html;
+<script>
+  let questions = [];
+  let currentQuestion = 0;
+  let score = 0;
+
+  fetch('./questions.json')
+    .then(response => response.json())
+    .then(data => {
+      questions = data;
+      showCategories();
+    })
+    .catch(err => console.error('Erreur chargement JSON:', err));
+
+  function showCategories() {
+    const categoriesDiv = document.getElementById('categories');
+    const categories = [...new Set(questions.map(q => q.category))];
+
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.innerText = cat;
+      btn.className = 'category-btn';
+      btn.onclick = () => startQuiz(cat);
+      categoriesDiv.appendChild(btn);
+    });
+  }
+
+  function startQuiz(category) {
+    const filteredQuestions = questions.filter(q => q.category === category);
+    if (filteredQuestions.length === 0) return;
+
+    questions = filteredQuestions;
+    currentQuestion = 0;
+    score = 0;
+
+    document.getElementById('categories').style.display = 'none';
+    document.getElementById('quiz').style.display = 'block';
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const q = questions[currentQuestion];
+    document.getElementById('question').innerText = q.question;
+
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = '';
+
+    q.answers.forEach((answer, index) => {
+      const btn = document.createElement('button');
+      btn.innerText = answer;
+      btn.onclick = () => checkAnswer(index);
+      answersDiv.appendChild(btn);
+    });
+
+    document.getElementById('score').innerText = `Score: ${score}/${questions.length}`;
+  }
+
+  function checkAnswer(index) {
+    if (index === questions[currentQuestion].correct) {
+      score++;
     }
-
-    function startQuiz(category) {
-      currentCategory = category;
-      currentIndex = 0;
-      score = 0;
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
       showQuestion();
+    } else {
+      showScore();
     }
+  }
 
-    function showQuestion() {
-      const game = document.getElementById("game");
-      const q = data[currentCategory][currentIndex];
-      let html = `<h2>${currentCategory.toUpperCase()}</h2>`;
-      html += `<div>${q.q}</div>`;
-      q.options.forEach((opt, i) => {
-        html += `<button class="btn" onclick="checkAnswer(${i})">${opt}</button>`;
-      });
-      game.innerHTML = html;
-    }
-
-    function checkAnswer(i) {
-      const q = data[currentCategory][currentIndex];
-      if (i === q.answer) score++;
-      currentIndex++;
-      if (currentIndex < data[currentCategory].length) {
-        showQuestion();
-      } else {
-        endQuiz();
-      }
-    }
-
-    function endQuiz() {
-      const game = document.getElementById("game");
-      game.innerHTML = `
-        <h2>✨ Quiz terminé ! ✨</h2>
-        <p>Score : ${score} / ${data[currentCategory].length}</p>
-        <button class="btn" onclick="showCategories()">Rejouer</button>
-      `;
-    }
-  </script>
+  function showScore() {
+    document.getElementById('question').innerText = `Quiz terminé ! Votre score: ${score}/${questions.length}`;
+    document.getElementById('answers').innerHTML = '';
+  }
+</script>
 
 </body>
 </html>

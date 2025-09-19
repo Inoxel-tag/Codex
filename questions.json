@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz Mystique</title>
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background: #1a1a1a;
+      color: #f8f8f8;
+      text-align: center;
+      padding: 30px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #2c2c2c;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #000;
+    }
+    .btn {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      background: #e2c36e;
+      color: #1a1a1a;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📜 Quiz du Grimoire Mystique</h1>
+  <div class="container" id="game">Chargement...</div>
+
+  <script>
+    let data = {};
+    let currentCategory = "";
+    let currentIndex = 0;
+    let score = 0;
+
+    fetch('questions.json')
+      .then(res => res.json())
+      .then(json => {
+        data = json;
+        showCategories();
+      });
+
+    function showCategories() {
+      const game = document.getElementById("game");
+      let html = "<h2>Choisis une catégorie :</h2>";
+      Object.keys(data).forEach(cat => {
+        html += `<button class="btn" onclick="startQuiz('${cat}')">${cat}</button>`;
+      });
+      game.innerHTML = html;
+    }
+
+    function startQuiz(category) {
+      currentCategory = category;
+      currentIndex = 0;
+      score = 0;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const game = document.getElementById("game");
+      const q = data[currentCategory][currentIndex];
+      let html = `<h2>${currentCategory.toUpperCase()}</h2>`;
+      html += `<div>${q.q}</div>`;
+      q.options.forEach((opt, i) => {
+        html += `<button class="btn" onclick="checkAnswer(${i})">${opt}</button>`;
+      });
+      game.innerHTML = html;
+    }
+
+    function checkAnswer(i) {
+      const q = data[currentCategory][currentIndex];
+      if (i === q.answer) score++;
+      currentIndex++;
+      if (currentIndex < data[currentCategory].length) {
+        showQuestion();
+      } else {
+        endQuiz();
+      }
+    }
+
+    function endQuiz() {
+      const game = document.getElementById("game");
+      game.innerHTML = `
+        <h2>✨ Quiz terminé ! ✨</h2>
+        <p>Score : ${score} / ${data[currentCategory].length}</p>
+        <button class="btn" onclick="showCategories()">Rejouer</button>
+      `;
+    }
+  </script>
+
+</body>
+</html>

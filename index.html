@@ -1,125 +1,123 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quiz du Codex Arcanum</title>
-  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>Quiz Magique</title>
   <style>
     body {
-      background: #1b0f07;
-      color: #f5e6c8;
-      font-family: 'MedievalSharp', cursive;
+      font-family: 'Georgia', serif;
+      background: #1a1a1a;
+      color: #f8f8f8;
       text-align: center;
-      padding: 20px;
+      padding: 30px;
     }
     h1 {
-      font-family: 'UnifrakturMaguntia', cursive;
-      font-size: 3rem;
-      margin-bottom: 30px;
-      text-shadow: 0 0 10px #d4af37;
+      color: #e2c36e;
+      text-shadow: 0 0 10px #e2c36e;
     }
-    .question {
-      font-size: 1.5rem;
-      margin: 20px 0;
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #2c2c2c;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #000;
     }
-    .answers button {
+    .btn {
       display: block;
       margin: 10px auto;
       padding: 10px 20px;
-      background: #3b2614;
-      border: 2px solid #d4af37;
-      color: #f5e6c8;
-      font-size: 1.2rem;
-      cursor: pointer;
+      background: #e2c36e;
+      color: #1a1a1a;
+      border: none;
       border-radius: 8px;
-      transition: 0.3s;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.2s;
     }
-    .answers button:hover {
-      background: #d4af37;
-      color: #1b0f07;
+    .btn:hover {
+      transform: scale(1.05);
     }
-    .resultat {
-      font-size: 1.4rem;
-      margin-top: 20px;
-      font-style: italic;
-      text-shadow: 0 0 8px #d4af37;
-    }
-    .score {
-      margin-top: 30px;
-      font-size: 1.6rem;
-      color: #d4af37;
+    .question {
+      margin: 20px 0;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
-  <h1>📜 Quiz du Codex Arcanum</h1>
-  <div id="quiz">
-    <div id="question" class="question"></div>
-    <div id="answers" class="answers"></div>
-    <div id="resultat" class="resultat"></div>
-    <div id="score" class="score"></div>
+
+  <h1>📜 Quiz du Grimoire Mystique</h1>
+
+  <div class="container" id="game">
+    <h2>Choisis une catégorie :</h2>
+    <button class="btn" onclick="startQuiz('science')">⚗️ Sciences</button>
+    <button class="btn" onclick="startQuiz('histoire')">🏛️ Histoire</button>
+    <button class="btn" onclick="startQuiz('magie')">🔮 Magie</button>
+    <button class="btn" onclick="startQuiz('animaux')">🐾 Animaux</button>
   </div>
 
   <script>
-    const questions = [
-      {
-        question: "Quel ingrédient est nécessaire pour un sort de lévitation ?",
-        answers: ["Plume de dragon", "Plume de hibou", "Pierre de lune"],
-        correct: 1
-      },
-      {
-        question: "Quelle est la langue utilisée dans les formules anciennes ?",
-        answers: ["Latin", "Grec ancien", "Elfique"],
-        correct: 0
-      },
-      {
-        question: "Combien de runes faut-il pour ouvrir un portail astral ?",
-        answers: ["3", "7", "5"],
-        correct: 2
-      }
-    ];
+    const questions = {
+      science: [
+        {q:"Quel est l’élément chimique 'O' ?", options:["Or","Oxygène","Osmium"], answer:1},
+        {q:"Combien y a-t-il de planètes dans le système solaire ?", options:["7","8","9"], answer:1},
+      ],
+      histoire: [
+        {q:"Qui était Napoléon Bonaparte ?", options:["Un peintre","Un empereur","Un astronaute"], answer:1},
+        {q:"En quelle année la Révolution française a-t-elle commencé ?", options:["1789","1812","1664"], answer:0},
+      ],
+      magie: [
+        {q:"Comment s'appelle l’école de magie d’Harry Potter ?", options:["Poudlard","Mordor","Camelot"], answer:0},
+        {q:"Quel est l’ingrédient principal d’une potion de soin ?", options:["Mandragore","Pierre de lune","Eau bénite"], answer:0},
+      ],
+      animaux: [
+        {q:"Quel est le plus grand mammifère ?", options:["Éléphant","Baleine bleue","Girafe"], answer:1},
+        {q:"Combien de pattes a une araignée ?", options:["6","8","10"], answer:1},
+      ]
+    };
 
-    let current = 0;
+    let currentCategory = "";
+    let currentIndex = 0;
     let score = 0;
 
-    function showQuestion() {
-      if (current >= questions.length) {
-        document.getElementById("quiz").innerHTML =
-          `<h2>⚡ Quiz terminé ⚡</h2>
-           <p>Score final : ${score}/${questions.length}</p>`;
-        return;
-      }
+    function startQuiz(category){
+      currentCategory = category;
+      currentIndex = 0;
+      score = 0;
+      showQuestion();
+    }
 
-      const q = questions[current];
-      document.getElementById("question").textContent = q.question;
-      const answersDiv = document.getElementById("answers");
-      answersDiv.innerHTML = "";
-
-      q.answers.forEach((answer, index) => {
-        const btn = document.createElement("button");
-        btn.textContent = answer;
-        btn.onclick = () => checkAnswer(index);
-        answersDiv.appendChild(btn);
+    function showQuestion(){
+      const game = document.getElementById("game");
+      const q = questions[currentCategory][currentIndex];
+      let html = `<h2>Question ${currentIndex+1}/${questions[currentCategory].length}</h2>`;
+      html += `<div class="question">${q.q}</div>`;
+      q.options.forEach((opt,i)=>{
+        html += `<button class="btn" onclick="checkAnswer(${i})">${opt}</button>`;
       });
-
-      document.getElementById("resultat").textContent = "";
-      document.getElementById("score").textContent = `Score : ${score}`;
+      game.innerHTML = html;
     }
 
-    function checkAnswer(index) {
-      const q = questions[current];
-      if (index === q.correct) {
-        score++;
-        document.getElementById("resultat").textContent = "✅ Bonne réponse !";
+    function checkAnswer(i){
+      const q = questions[currentCategory][currentIndex];
+      if(i === q.answer) score++;
+      currentIndex++;
+      if(currentIndex < questions[currentCategory].length){
+        showQuestion();
       } else {
-        document.getElementById("resultat").textContent = "❌ Mauvaise réponse…";
+        endQuiz();
       }
-      current++;
-      setTimeout(showQuestion, 1000);
     }
 
-    showQuestion();
+    function endQuiz(){
+      const game = document.getElementById("game");
+      game.innerHTML = `
+        <h2>✨ Quiz terminé ! ✨</h2>
+        <p>Score : ${score} / ${questions[currentCategory].length}</p>
+        <button class="btn" onclick="location.reload()">Rejouer</button>
+      `;
+    }
   </script>
+
 </body>
 </html>

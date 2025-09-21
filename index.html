@@ -103,7 +103,7 @@
 </head>
 <body>
 
-<h1>Quiz Codex</h1>
+<h1>Questions pour un maitre</h1>
 
 <div id="categories">
   <h2>Choisis une catégorie</h2>
@@ -123,7 +123,7 @@ fetch("questions.json")
   .then(response => response.json())
   .then(json => {
     data = json;
-    createCategoryButtons(); // quand le JSON est chargé, on crée les boutons
+    createCategoryButtons();
   })
   .catch(error => console.error("Erreur de chargement JSON :", error));
 

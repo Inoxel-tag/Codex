@@ -57,25 +57,6 @@
     box-shadow: 0 5px 10px rgba(0,0,0,0.2);
   }
 
-  .category-btn::after, .answer-btn::after {
-    content: "";
-    display: inline-block;
-    height: 100%;
-    width: 100%;
-    border-radius: 100px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    transition: all 0.4s;
-    background-color: #fff;
-  }
-
-  .category-btn:hover::after, .answer-btn:hover::after {
-    transform: scaleX(1.4) scaleY(1.6);
-    opacity: 0;
-  }
-
   #quiz {
     background: rgba(255,255,255,0.1);
     padding: 30px;
@@ -103,11 +84,10 @@
 </head>
 <body>
 
-<h1>Questions pour un maitre</h1>
+<h1>Questions pour un maître</h1>
 
 <div id="categories">
   <h2>Choisis une catégorie</h2>
-  <!-- Les boutons seront générés en JS -->
 </div>
 
 <div id="quiz" style="display:none;">
@@ -138,7 +118,6 @@ let currentQuestions = [];
 let currentIndex = 0;
 let score = 0;
 
-// Création dynamique des boutons une fois le JSON chargé
 function createCategoryButtons() {
   Object.keys(data).forEach(cat => {
     const btn = document.createElement("button");
@@ -167,11 +146,11 @@ function showQuestion() {
     return;
   }
   const q = currentQuestions[currentIndex];
-  questionDiv.innerText = q.question;
+  questionDiv.innerText = q.q;
   answersDiv.innerHTML = "";
   scoreDiv.innerText = `Score : ${score} / ${currentIndex}`;
   
-  q.answers.forEach((answer, index) => {
+  q.options.forEach((answer, index) => {
     const btn = document.createElement("button");
     btn.innerText = answer;
     btn.className = "answer-btn";
@@ -182,54 +161,7 @@ function showQuestion() {
 
 function checkAnswer(selected) {
   const q = currentQuestions[currentIndex];
-  if (selected === q.correct) score++;
-  currentIndex++;
-  showQuestion();
-}
-
-// Création des boutons de catégories
-Object.keys(data).forEach(cat => {
-  const btn = document.createElement("button");
-  btn.innerText = cat;
-  btn.className = "category-btn";
-  btn.onclick = () => startQuiz(cat);
-  categoriesDiv.appendChild(btn);
-});
-
-function startQuiz(category) {
-  currentCategory = category;
-  currentQuestions = [...data[category]]; // copie des questions
-  currentIndex = 0;
-  score = 0;
-  categoriesDiv.style.display = "none";
-  quizDiv.style.display = "block";
-  showQuestion();
-}
-
-function showQuestion() {
-  if(currentIndex >= currentQuestions.length){
-    questionDiv.innerText = "Quiz terminé !";
-    answersDiv.innerHTML = "";
-    scoreDiv.innerText = `Score final : ${score} / ${currentQuestions.length}`;
-    return;
-  }
-  const q = currentQuestions[currentIndex];
-  questionDiv.innerText = q.question;
-  answersDiv.innerHTML = "";
-  scoreDiv.innerText = `Score : ${score} / ${currentIndex}`;
-  
-  q.answers.forEach((answer, index) => {
-    const btn = document.createElement("button");
-    btn.innerText = answer;
-    btn.className = "answer-btn";
-    btn.onclick = () => checkAnswer(index);
-    answersDiv.appendChild(btn);
-  });
-}
-
-function checkAnswer(selected) {
-  const q = currentQuestions[currentIndex];
-  if(selected === q.correct) score++;
+  if (selected === q.answer) score++;
   currentIndex++;
   showQuestion();
 }

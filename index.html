@@ -117,21 +117,15 @@
 </div>
 
 <script>
-// Base de données JSON des questions
-const data = {
-  "Géographie": [
-    {question: "Quelle est la capitale de la France ?", answers: ["Paris","Lyon","Marseille","Nice"], correct: 0},
-    {question: "Quelle est la plus grande île du monde ?", answers: ["Madagascar","Groenland","Borneo","Sumatra"], correct: 1}
-  ],
-  "Science": [
-    {question: "Quelle planète est la plus proche du Soleil ?", answers: ["Mercure","Venus","Mars","Jupiter"], correct: 0},
-    {question: "Quel est l'élément chimique de symbole O ?", answers: ["Or","Oxygène","Osmium","Oganesson"], correct: 1}
-  ],
-  "Histoire": [
-    {question: "Qui a découvert l'Amérique ?", answers: ["Vasco de Gama","Christophe Colomb","Magellan","Amerigo Vespucci"], correct: 1},
-    {question: "En quelle année a eu lieu la Révolution française ?", answers: ["1789","1776","1804","1799"], correct: 0}
-  ]
-};
+let data = {};
+
+fetch("questions.json")
+  .then(response => response.json())
+  .then(json => {
+    data = json;
+    createCategoryButtons(); // quand le JSON est chargé, on crée les boutons
+  })
+  .catch(error => console.error("Erreur de chargement JSON :", error));
 
 const categoriesDiv = document.getElementById("categories");
 const quizDiv = document.getElementById("quiz");
@@ -143,6 +137,55 @@ let currentCategory = null;
 let currentQuestions = [];
 let currentIndex = 0;
 let score = 0;
+
+// Création dynamique des boutons une fois le JSON chargé
+function createCategoryButtons() {
+  Object.keys(data).forEach(cat => {
+    const btn = document.createElement("button");
+    btn.innerText = cat;
+    btn.className = "category-btn";
+    btn.onclick = () => startQuiz(cat);
+    categoriesDiv.appendChild(btn);
+  });
+}
+
+function startQuiz(category) {
+  currentCategory = category;
+  currentQuestions = [...data[category]];
+  currentIndex = 0;
+  score = 0;
+  categoriesDiv.style.display = "none";
+  quizDiv.style.display = "block";
+  showQuestion();
+}
+
+function showQuestion() {
+  if (currentIndex >= currentQuestions.length) {
+    questionDiv.innerText = "Quiz terminé !";
+    answersDiv.innerHTML = "";
+    scoreDiv.innerText = `Score final : ${score} / ${currentQuestions.length}`;
+    return;
+  }
+  const q = currentQuestions[currentIndex];
+  questionDiv.innerText = q.question;
+  answersDiv.innerHTML = "";
+  scoreDiv.innerText = `Score : ${score} / ${currentIndex}`;
+  
+  q.answers.forEach((answer, index) => {
+    const btn = document.createElement("button");
+    btn.innerText = answer;
+    btn.className = "answer-btn";
+    btn.onclick = () => checkAnswer(index);
+    answersDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected) {
+  const q = currentQuestions[currentIndex];
+  if (selected === q.correct) score++;
+  currentIndex++;
+  showQuestion();
+}
 
 // Création des boutons de catégories
 Object.keys(data).forEach(cat => {

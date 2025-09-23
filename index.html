@@ -32,14 +32,12 @@
     position: relative;
     font-size: 17px;
     text-transform: uppercase;
-    text-decoration: none;
     padding: 1em 2.5em;
     display: inline-block;
     cursor: pointer;
     border-radius: 6em;
     transition: all 0.2s;
     border: none;
-    font-family: inherit;
     font-weight: 500;
     color: black;
     background-color: white;
@@ -52,11 +50,6 @@
     box-shadow: 0 10px 20px rgba(0,0,0,0.2);
   }
 
-  .category-btn:active, .answer-btn:active {
-    transform: translateY(-1px);
-    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-  }
-
   #quiz {
     background: rgba(255,255,255,0.1);
     padding: 30px;
@@ -64,6 +57,7 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     width: 90%;
     max-width: 600px;
+    transition: opacity 0.5s ease-in-out;
   }
 
   .question {
@@ -80,6 +74,22 @@
     font-size: 1.2em;
     font-weight: bold;
   }
+
+  .progress-bar {
+    width: 100%;
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+    margin: 20px 0;
+    height: 20px;
+    overflow: hidden;
+  }
+
+  .progress {
+    height: 100%;
+    background: limegreen;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
 </style>
 </head>
 <body>
@@ -91,6 +101,7 @@
 </div>
 
 <div id="quiz" style="display:none;">
+  <div class="progress-bar"><div class="progress"></div></div>
   <div class="question"></div>
   <div class="answers"></div>
   <div class="score"></div>
@@ -112,11 +123,16 @@ const quizDiv = document.getElementById("quiz");
 const questionDiv = quizDiv.querySelector(".question");
 const answersDiv = quizDiv.querySelector(".answers");
 const scoreDiv = quizDiv.querySelector(".score");
+const progressBar = quizDiv.querySelector(".progress");
 
 let currentCategory = null;
 let currentQuestions = [];
 let currentIndex = 0;
 let score = 0;
+
+function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
 
 function createCategoryButtons() {
   Object.keys(data).forEach(cat => {
@@ -130,7 +146,7 @@ function createCategoryButtons() {
 
 function startQuiz(category) {
   currentCategory = category;
-  currentQuestions = [...data[category]];
+  currentQuestions = shuffle([...data[category]]);
   currentIndex = 0;
   score = 0;
   categoriesDiv.style.display = "none";
@@ -142,28 +158,63 @@ function showQuestion() {
   if (currentIndex >= currentQuestions.length) {
     questionDiv.innerText = "Quiz terminé !";
     answersDiv.innerHTML = "";
-    scoreDiv.innerText = `Score final : ${score} / ${currentQuestions.length}`;
+    let bestScore = localStorage.getItem("bestScore") || 0;
+    if (score > bestScore) {
+      localStorage.setItem("bestScore", score);
+      bestScore = score;
+    }
+    scoreDiv.innerText = `Score final : ${score} / ${currentQuestions.length} | Meilleur score : ${bestScore}`;
+
+    const retryBtn = document.createElement("button");
+    retryBtn.innerText = "Rejouer";
+    retryBtn.className = "category-btn";
+    retryBtn.onclick = () => {
+      categoriesDiv.style.display = "block";
+      quizDiv.style.display = "none";
+    };
+    answersDiv.appendChild(retryBtn);
     return;
   }
+
   const q = currentQuestions[currentIndex];
   questionDiv.innerText = q.q;
   answersDiv.innerHTML = "";
   scoreDiv.innerText = `Score : ${score} / ${currentIndex}`;
   
-  q.options.forEach((answer, index) => {
+  let options = shuffle([...q.options]);
+  options.forEach((answer, index) => {
     const btn = document.createElement("button");
     btn.innerText = answer;
     btn.className = "answer-btn";
-    btn.onclick = () => checkAnswer(index);
+    btn.onclick = () => checkAnswer(answer, q);
     answersDiv.appendChild(btn);
   });
+
+  updateProgress();
 }
 
-function checkAnswer(selected) {
-  const q = currentQuestions[currentIndex];
-  if (selected === q.answer) score++;
-  currentIndex++;
-  showQuestion();
+function checkAnswer(selected, question) {
+  const buttons = answersDiv.querySelectorAll("button");
+  buttons.forEach(btn => {
+    if (btn.innerText === question.options[question.answer]) {
+      btn.style.backgroundColor = "limegreen";
+    } else if (btn.innerText === selected && selected !== question.options[question.answer]) {
+      btn.style.backgroundColor = "crimson";
+    }
+    btn.disabled = true;
+  });
+
+  if (selected === question.options[question.answer]) score++;
+
+  setTimeout(() => {
+    currentIndex++;
+    showQuestion();
+  }, 1000);
+}
+
+function updateProgress() {
+  const percent = (currentIndex / currentQuestions.length) * 100;
+  progressBar.style.width = percent + "%";
 }
 </script>
 
